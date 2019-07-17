@@ -2,6 +2,11 @@
 # This condition cannot be set outside of the role
 # If set in the 'when' of the loop, it's not evaluated between calls
 # and this role will run everytime.
+- debug:
+    var: stack_deployed
+- debug:
+    msg: "AWS REGION ISSSSSSSSSSS {{aws_region}}"
+- pause:
 - when: stack_deployed is not defined or stack_deployed == false
   block:
     - set_fact:
@@ -134,7 +139,8 @@
           retries: 5
           delay: "{{ cloudformation_retry_delay | default(60) }}"
           ignore_errors: yes
-
+        - debug:
+            msg: "22222 checkl for {{stack_deployed}}"
         - name: report s3 error
           fail:
             msg: "FAIL {{ project_tag }} delete s3"
@@ -200,10 +206,34 @@
         - cloudformation_out is succeeded
         - aws_region != aws_region_final
 
+    - debug:
+        msg: "2 checkl for {{target_regions}}"
+      when: target_regions is defined
+    - debug:
+        msg: "CLOUDDDDFFORORORMSMSSMMS {{cloudformation_out}}"
+
+    - pause:
+    - debug:
+        msg: "5 checkl for {{target_regions}}"
+      when: target_regions is defined
+    - pause:
+
     - set_fact:
         stack_deployed: true
       when: cloudformation_out is succeeded
 
-    - set_fact:
+    - name: set stack_deployed to false if cloudformation_out is failed
+      set_fact:
         stack_deployed: false
       when: cloudformation_out is failed
+
+    - name: set stack_deployed to false if target_regions is defined
+      set_fact:
+        stack_deployed1: false
+      when: target_regions is defined
+
+
+    - debug:
+        msg: "5 checkl for {{stack_deployed1}}"
+      when: target_regions is defined
+    - pause:

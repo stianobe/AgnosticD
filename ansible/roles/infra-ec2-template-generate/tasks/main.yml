@@ -1,12 +1,18 @@
 ---
-- import_tasks: locate_template.yml
+# This should be include
+- include_tasks: locate_template.yml
 
 - set_fact:
     cloudformation_template: "{{output_dir}}/{{ env_type }}.{{ guid }}.{{cloud_provider}}_cloud_template"
+  when: cloudformation_template is not defined
 
 - name: Print cloudformation_template
   debug:
     var: cloudformation_template
+
+- name: Print cloudformation_template_src
+  debug:
+    var: cloudformation_template_src
 
 - name: AWS Generate CloudFormation Template
   template:
