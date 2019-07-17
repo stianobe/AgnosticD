@@ -234,7 +234,7 @@
 ### This gets all the next lines to be evaluated.
     - set_fact:
         stack_deployed: true
-      when: cloudformation_out is succeeded and target_regions is not defined
+      when: cloudformation_out is succeeded
 
     - name: set stack_deployed to false if cloudformation_out is failed
       set_fact:
@@ -243,7 +243,7 @@
 
     - name: set stack_deployed to false if target_regions is defined
       set_fact:
-        stack_deployed1: false
+        stack_deployed: false
       when: target_regions is defined
 
 
