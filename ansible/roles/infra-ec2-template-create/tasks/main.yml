@@ -1,12 +1,18 @@
 ---
+
+
+## Delete this debug
+# - debug:
+#     var: stack_deployed
+# - debug:
+#     msg: "AWS REGION ISSSSSSSSSSS {{aws_region}}"
+# - pause:
+
+
+
 # This condition cannot be set outside of the role
 # If set in the 'when' of the loop, it's not evaluated between calls
 # and this role will run everytime.
-- debug:
-    var: stack_deployed
-- debug:
-    msg: "AWS REGION ISSSSSSSSSSS {{aws_region}}"
-- pause:
 - when: stack_deployed is not defined or stack_deployed == false
   block:
     - set_fact:
@@ -212,15 +218,23 @@
     - debug:
         msg: "CLOUDDDDFFORORORMSMSSMMS {{cloudformation_out}}"
 
-    - pause:
-    - debug:
-        msg: "5 checkl for {{target_regions}}"
-      when: target_regions is defined
-    - pause:
+## Delete
+    # - pause:
+    # - debug:
+    #     msg: "5 checkl for {{target_regions}}"
+    #   when: target_regions is defined
+    # - pause:
 
+
+## This gets all the next lines to skip
+    # - set_fact:
+    #     stack_deployed: true
+    #   when: cloudformation_out is succeeded
+
+### This gets all the next lines to be evaluated.
     - set_fact:
         stack_deployed: true
-      when: cloudformation_out is succeeded
+      when: cloudformation_out is succeeded and target_regions is not defined
 
     - name: set stack_deployed to false if cloudformation_out is failed
       set_fact:
@@ -234,6 +248,6 @@
 
 
     - debug:
-        msg: "5 checkl for {{stack_deployed1}}"
+        msg: "5 checkl for {{stack_deployed}}"
       when: target_regions is defined
     - pause:
