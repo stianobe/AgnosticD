@@ -107,6 +107,7 @@ instances:
     flavor:
       ec2: "{{bastion_instance_type}}"
       azure: Standard_A2_V2
+      osp: "m1.tiny"
     tags:
       - key: "AnsibleGroup"
         value: "bastions"
@@ -124,6 +125,7 @@ instances:
     flavor:
       ec2: "{{frontend_instance_type}}"
       azure: "Standard_A2_V2"
+      osp: "m1.tiny"
     tags:
       - key: "AnsibleGroup"
         value: "frontends"
@@ -139,6 +141,7 @@ instances:
     flavor:
       ec2: "{{app_instance_type}}"
       azure: "Standard_A2_V2"
+      osp: "m1.tiny"
     tags:
       - key: "AnsibleGroup"
         value: "apps"
@@ -155,6 +158,7 @@ instances:
     flavor:
       ec2: "{{appdb_instance_type}}"
       azure: "Standard_A2_V2"
+      osp: "m1.tiny"
     tags:
       - key: "AnsibleGroup"
         value: "appdbs"
@@ -171,6 +175,7 @@ instances:
     flavor:
       ec2: "{{support_instance_type}}"
       azure: "Standard_A2_V2"
+      osp: "m1.tiny"
     tags:
       - key: "AnsibleGroup"
         value: "support"

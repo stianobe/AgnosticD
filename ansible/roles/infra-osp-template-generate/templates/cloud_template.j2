@@ -1,156 +1,28 @@
-heat_template_version: 2016-10-14
-
-description: This template will create two servers and assign one a public IP address.
-
-parameters:
-  server_image:
-    type: string
-    description: Name of the Glance image to use
-    default: rhel-guest
-  provider_network:
-    type: string
-    description: Name of the provider network.
-    default: external
-  guid:
-    type: string
-    description: 4 charcter prefix (GUID) to be used when creating the stack
-    default: ABCD
-  public_key:
-    type: string
-    description: public key used when creating a keypair
-    default: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDbs2TMLeiLnA62roXizdJ1GXTiVvk/Vnlv66rYYJFBR9fZxUZt9f7OVklwUxs+KcuXF0ZUA0bltWwCxjfEjJjzt5di74rzWnVy4MAAlY46aCc0dXioIhtcPJVVZ+zYaQS8K5BFXPT/bZPoF/y+d8iFO3Oszl0YeZbXVZAwyehUCFFGa98TPbA0WH7xzYbiXLVMnxwIgj8qKM8pubB9BkyrSaOe7zSHbBLoEz5p+g/Ha5fWPTLObSpOzR/oRNQItvqMj6zSIdwz3+S9wLKyngala8eIp+2dkGaBi7hOmV0pDIkUvhRjtKiBBCW2bmCTMK6sGyKrNkf2QFxihHeljscJ"
-
-resources:
-  web_flavor:
-    type: OS::Nova::Flavor
-    properties:
-      ram: 2048
-      vcpus: 2
-      disk: 0
-      name: m1.small
-      tenants:
-      - { get_resource: openstack_project }
-
-  db_flavor:
-    type: OS::Nova::Flavor
-    properties:
-      ram: 16384
-      vcpus: 8
-      disk: 50
-      name: m1.db
-      tenants:
-      - { get_resource: openstack_project }
-
-  user_password:
-    type: OS::Heat::RandomString
-
-  admin_password:
-    type: OS::Heat::RandomString
-
-  openstack_project:
-    type: OS::Keystone::Project
-    properties:
-      name: { get_param: guid }
-      domain: default
-      description: New project
-
-  openstack_member_user:
-    type: OS::Keystone::User
-    properties:
-      name:
-        list_join: [ '-', [ { get_param: guid }, 'user' ]]
-      domain: default
-      description: User account for project
-      default_project: { get_resource: openstack_project }
-      password: { get_attr: [ user_password, value ] }
-      roles:
-        - role: member
-          project: { get_resource: openstack_project }
-
-  openstack_admin_user:
-    type: OS::Keystone::User
-    properties:
-      name:
-        list_join: [ '-', [ { get_param: guid }, 'admin' ]]
-      domain: default
-      description: User account for project
-      default_project: { get_resource: openstack_project }
-      password: { get_attr: [ admin_password, value ] }
-      roles:
-        - role: admin
-          project: { get_resource: openstack_project }
-
-  security_group:
-    type: OS::Neutron::SecurityGroup
-    properties:
-      name:
-        list_join: [ '-', [ { get_param: guid }, 'sg' ]]
-      description: Ping and SSH
-      rules:
-      - protocol: icmp
-      - protocol: tcp
-        port_range_min: 22
-        port_range_max: 22
-      - protocol: tcp
-        port_range_min: 5000
-        port_range_max: 5000
-      - protocol: tcp
-        port_range_min: 80
-        port_range_max: 80
-
-  tenant_key:
-    type: OS::Nova::KeyPair
-    properties:
-      name:
-        list_join: [ '-', [ { get_param: guid }, 'keypair' ]]
-      public_key: { get_param: public_key }
-
-  tenant_network:
-    type: OS::Neutron::Net
-    properties:
-      name:
-        list_join: [ '-', [ { get_param: guid }, 'net' ]]
-      shared: false
-      tenant_id: { get_resource: openstack_project }
-
-  tenant_subnet:
-    type: OS::Neutron::Subnet
-    properties:
-      name:
-        list_join: [ '-', [ { get_param: guid }, 'subnet' ]]
-      network_id: { get_resource: tenant_network }
-      cidr: 172.16.44.0/25
-      dns_nameservers: [ "8.8.8.8" ]
-      gateway_ip: 172.16.44.1
-      allocation_pools:
-        - start: 172.16.44.2
-          end: 172.16.44.63
-      tenant_id: { get_resource: openstack_project }
-
-  tenant_router:
-    type: OS::Neutron::Router
-    properties:
-      name:
-        list_join: [ '-', [ { get_param: guid }, 'router' ]]
-      external_gateway_info:
-        network: { get_param: provider_network }
-
-  router_interface:
-    type: OS::Neutron::RouterInterface
-    properties:
-      router: { get_resource: tenant_router }
-      subnet: { get_resource: tenant_subnet }
-
-  web_server:
+{% for instance in instances %}
+{% for c in range(1,(instance['count'] |int)+1) %}
+  {{instance['name']}}{{loop.index}}:
     type: OS::Nova::Server
     properties:
+    {% if instance['unique'] | d(false) | bool %}
       name:
-        list_join: [ '-', [ { get_param: guid }, 'web' ]]
-      image: { get_param: server_image }
-      flavor: { get_resource: web_flavor }
+            {{instance['name']}}
+    {% else %}
+      name:
+            {{instance['name']}}{{loop.index}}
+    {% endif %}
+      image:
+    {% if custom_image is defined %}
+            {{ custom_image.image_id }}
+    {% else %}
+        {{ instance.image_id | default(osp_default_image) }}
+    {% endif %}
+      flavor:
+            {{instance['flavor'][cloud_provider]}}
       key_name: { get_resource: tenant_key }
       networks:
         - port: { get_resource: www_nic }
+{% endfor %}
+{% endfor %}
 
   www_nic:
     type: OS::Neutron::Port
@@ -187,3 +59,160 @@ resources:
       security_groups:
         - { get_resource: security_group }
 
+### This was at the top
+
+
+##Original
+  web_server:
+    type: OS::Nova::Server
+    properties:
+      name:
+        list_join: [ '-', [ { get_param: guid }, 'web' ]]
+      image: { get_param: server_image }
+      flavor: { get_resource: web_flavor }
+      key_name: { get_resource: tenant_key }
+      networks:
+        - port: { get_resource: www_nic }
+
+        heat_template_version: 2016-10-14
+
+        description: This template will create two servers and assign one a public IP address.
+
+        parameters:
+          server_image:
+            type: string
+            description: Name of the Glance image to use
+            default: rhel-guest
+          provider_network:
+            type: string
+            description: Name of the provider network.
+            default: external
+          guid:
+            type: string
+            description: 4 charcter prefix (GUID) to be used when creating the stack
+            default: ABCD
+          public_key:
+            type: string
+            description: public key used when creating a keypair
+            default: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDbs2TMLeiLnA62roXizdJ1GXTiVvk/Vnlv66rYYJFBR9fZxUZt9f7OVklwUxs+KcuXF0ZUA0bltWwCxjfEjJjzt5di74rzWnVy4MAAlY46aCc0dXioIhtcPJVVZ+zYaQS8K5BFXPT/bZPoF/y+d8iFO3Oszl0YeZbXVZAwyehUCFFGa98TPbA0WH7xzYbiXLVMnxwIgj8qKM8pubB9BkyrSaOe7zSHbBLoEz5p+g/Ha5fWPTLObSpOzR/oRNQItvqMj6zSIdwz3+S9wLKyngala8eIp+2dkGaBi7hOmV0pDIkUvhRjtKiBBCW2bmCTMK6sGyKrNkf2QFxihHeljscJ"
+
+        resources:
+          web_flavor:
+            type: OS::Nova::Flavor
+            properties:
+              ram: 2048
+              vcpus: 2
+              disk: 0
+              name: m1.small
+              tenants:
+              - { get_resource: openstack_project }
+
+          db_flavor:
+            type: OS::Nova::Flavor
+            properties:
+              ram: 16384
+              vcpus: 8
+              disk: 50
+              name: m1.db
+              tenants:
+              - { get_resource: openstack_project }
+
+          user_password:
+            type: OS::Heat::RandomString
+
+          admin_password:
+            type: OS::Heat::RandomString
+
+          openstack_project:
+            type: OS::Keystone::Project
+            properties:
+              name: { get_param: guid }
+              domain: default
+              description: New project
+
+          openstack_member_user:
+            type: OS::Keystone::User
+            properties:
+              name:
+                list_join: [ '-', [ { get_param: guid }, 'user' ]]
+              domain: default
+              description: User account for project
+              default_project: { get_resource: openstack_project }
+              password: { get_attr: [ user_password, value ] }
+              roles:
+                - role: member
+                  project: { get_resource: openstack_project }
+
+          openstack_admin_user:
+            type: OS::Keystone::User
+            properties:
+              name:
+                list_join: [ '-', [ { get_param: guid }, 'admin' ]]
+              domain: default
+              description: User account for project
+              default_project: { get_resource: openstack_project }
+              password: { get_attr: [ admin_password, value ] }
+              roles:
+                - role: admin
+                  project: { get_resource: openstack_project }
+
+          security_group:
+            type: OS::Neutron::SecurityGroup
+            properties:
+              name:
+                list_join: [ '-', [ { get_param: guid }, 'sg' ]]
+              description: Ping and SSH
+              rules:
+              - protocol: icmp
+              - protocol: tcp
+                port_range_min: 22
+                port_range_max: 22
+              - protocol: tcp
+                port_range_min: 5000
+                port_range_max: 5000
+              - protocol: tcp
+                port_range_min: 80
+                port_range_max: 80
+
+          tenant_key:
+            type: OS::Nova::KeyPair
+            properties:
+              name:
+                list_join: [ '-', [ { get_param: guid }, 'keypair' ]]
+              public_key: { get_param: public_key }
+
+          tenant_network:
+            type: OS::Neutron::Net
+            properties:
+              name:
+                list_join: [ '-', [ { get_param: guid }, 'net' ]]
+              shared: false
+              tenant_id: { get_resource: openstack_project }
+
+          tenant_subnet:
+            type: OS::Neutron::Subnet
+            properties:
+              name:
+                list_join: [ '-', [ { get_param: guid }, 'subnet' ]]
+              network_id: { get_resource: tenant_network }
+              cidr: 172.16.44.0/25
+              dns_nameservers: [ "8.8.8.8" ]
+              gateway_ip: 172.16.44.1
+              allocation_pools:
+                - start: 172.16.44.2
+                  end: 172.16.44.63
+              tenant_id: { get_resource: openstack_project }
+
+          tenant_router:
+            type: OS::Neutron::Router
+            properties:
+              name:
+                list_join: [ '-', [ { get_param: guid }, 'router' ]]
+              external_gateway_info:
+                network: { get_param: provider_network }
+
+          router_interface:
+            type: OS::Neutron::RouterInterface
+            properties:
+              router: { get_resource: tenant_router }
+              subnet: { get_resource: tenant_subnet }
