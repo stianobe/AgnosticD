@@ -1,0 +1,27 @@
+---
+
+student:
+  name: Test Student
+  username: student
+  password: student
+  email: student@example.com
+
+networks:
+
+  - public_network:
+      name: public_network
+      cidr: 192.168.1.0/24
+      gateway: 192.168.1.1
+
+  - private_network:
+      name: private_network
+      cidr: 172.16.0.0/24
+
+servers:
+
+  - web1:
+      name: www01
+      image: rhel-guest-7.6
+      flavor: web
+
+heat_template_dest: sample-heat-stack.yml

@@ -1,0 +1,133 @@
+heat_template_version: 2016-10-14
+
+description: This template will create two servers and assign one a public IP address.
+
+parameters:
+  server_image:
+    type: string
+    description: Name of the Glance image to use
+    default: rhel-guest
+  provider_network:
+    type: string
+    description: Name of the provider network.
+    default: external
+  guid:
+    type: string
+    description: 4 charcter prefix (GUID) to be used when creating the stack
+    default: ABCD
+  db_flavor:
+    type: string
+    description: OSP Flavor for the Database tier
+    default: m1.db
+  web_flavor:
+    type: string
+    description: OSP Flavor for the WWW tier
+    default: m1.small
+  openstack_project:
+    type: string
+    description: The OSP Project ID for the student
+  keypair:
+    type: string
+    description: Keypair that was created for the student
+
+resources:
+
+  security_group:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      name:
+        list_join: [ '-', [ { get_param: guid }, 'sg' ]]
+      description: Ping and SSH
+      rules:
+      - protocol: icmp
+      - protocol: tcp
+        port_range_min: 22
+        port_range_max: 22
+      - protocol: tcp
+        port_range_min: 5000
+        port_range_max: 5000
+      - protocol: tcp
+        port_range_min: 80
+        port_range_max: 80
+
+  tenant_network:
+    type: OS::Neutron::Net
+    properties:
+      name:
+        list_join: [ '-', [ { get_param: guid }, 'net' ]]
+      shared: false
+      tenant_id: { get_param: openstack_project }
+
+  tenant_subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      name:
+        list_join: [ '-', [ { get_param: guid }, 'subnet' ]]
+      network_id: { get_resource: tenant_network }
+      cidr: 172.16.44.0/25
+      dns_nameservers: [ "8.8.8.8" ]
+      gateway_ip: 172.16.44.1
+      allocation_pools:
+        - start: 172.16.44.2
+          end: 172.16.44.63
+      tenant_id: { get_param: openstack_project }
+
+  tenant_router:
+    type: OS::Neutron::Router
+    properties:
+      name:
+        list_join: [ '-', [ { get_param: guid }, 'router' ]]
+      external_gateway_info:
+        network: { get_param: provider_network }
+
+  router_interface:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router: { get_resource: tenant_router }
+      subnet: { get_resource: tenant_subnet }
+
+  web_server:
+    type: OS::Nova::Server
+    properties:
+      name:
+        list_join: [ '-', [ { get_param: guid }, 'web' ]]
+      image: { get_param: server_image }
+      flavor: { get_param: web_flavor }
+      key_name: { get_param: keypair }
+      networks:
+        - port: { get_resource: www_nic }
+
+  www_nic:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_resource: tenant_network }
+      fixed_ips:
+        - subnet: { get_resource: tenant_subnet }
+      security_groups:
+        - { get_resource: security_group }
+
+  www_fip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network: { get_param: provider_network }
+      port_id: { get_resource: www_nic }
+
+  db_server:
+    type: OS::Nova::Server
+    properties:
+      name:
+        list_join: [ '-', [ {get_param: guid }, 'db' ]]
+      image: { get_param: server_image }
+      flavor: { get_param: db_flavor }
+      key_name: { get_param: keypair }
+      networks:
+        - port: { get_resource: db_nic }
+
+  db_nic:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_resource: tenant_network }
+      fixed_ips:
+        - subnet: {get_resource: tenant_subnet }
+      security_groups:
+        - { get_resource: security_group }
