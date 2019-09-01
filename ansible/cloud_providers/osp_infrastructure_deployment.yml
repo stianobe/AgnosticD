@@ -8,86 +8,40 @@
   become: false
   tasks:
 
-    - name: Create OSP Project
-      os_project:
-        cloud: opentlc
-        state: present
-        name: "{{ guid }}"
-        domain_id: default
-      register: OSP_PROJECT
-
-    - name: Dump dictionary
-      debug:
-        msg: "{{ OSP_PROJECT }}"
-
-    - name: Create OSP User 
-      os_user:
-        cloud: opentlc
-        state: present
-        name: "{{ student.username }}"
-        password: "{{ student.password }}"
-        email: "{{ student.email }}"
-        domain: default
-
-    - name: Grant user a role in project
-      os_user_role:
-        cloud: opentlc
-        role: _member_
-        project: "{{ OSP_PROJECT.project.name }}"
-        user: "{{ student.username }}"
-
     - name: Create SSH Keypair from existing key
       when: student.public_key is defined
       os_keypair:
-        region_name: regionOne
-        auth:
-          auth_url: 'http://www.osp.opentlc.com:5000/v3'
-          username:  "{{ student.username }} "
-          password: "{{student.password }}"
-          project_name: "{{ OSP_PROJECT.project.name }}"
-          project_domain_name: Default
-          user_domain_name: Default
+        cloud: opentlc
         state: present
-        name: "{{ student.username }}_key"
+        name: "student_key"
         public_key: "{{ student.public_key }}"
 
     - name: Create SSH Keypair for user
       when: student.public_key is not defined
       os_keypair:
-        region_name: regionOne
-        auth:
-          auth_url: 'http://www.osp.opentlc.com:5000/v3'
-          username:  "{{ student.username }} "
-          password: "{{ student.password }}"
-          project_name: "{{ OSP_PROJECT.project.name }}"
-          project_domain_name: Default
-          user_domain_name: Default
+        cloud: opentlc
         state: present 
-        name: "{{ student.username }}_key"
+        name: "student_key"
       register: student.keypair       
 
-#    - name: Generate Heat Template
-#      template:
-#        src: "{{ heat_template_source }}"
-#        dest: "{{ heat_template_dest }}"
+    - name: Display private key if keypair was created
+      when: student.keypair is defined
+      debug:
+        msg: "{{ student.keypair }}"
+
+    - name: Generate Heat Template
+      import_role:
+        name: infra-osp-template-generate
+      vars:
+        heat_template_dest: "{{ heat_template_dest }}"
 
     - name: Deploy Heat Stack
       os_stack:
         name: "{{ guid }}"
-        auth:
-          auth_url: 'http://www.osp.opentlc.com:5000/v3'
-          username:  "{{ student.username }} "
-          password: "{{ student.password }}"
-          project_name: "{{ OSP_PROJECT.project.name }}"
-          project_domain_name: Default
-          user_domain_name: Default
+        cloud: opentlc
         state: present
         template: "{{ heat_template_dest }}"
         parameters:
           guid: "{{ guid }}"
-          server_image: rhel-guest-7.6
-          openstack_project: "{{ OSP_PROJECT.project.id }}"
-          db_flavor: m1.db
-          web_flavor: m1.small
-          keypair: "{{ student.username }}_key"
+          keypair_name: "student_key"
 

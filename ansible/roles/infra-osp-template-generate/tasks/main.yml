@@ -1,55 +1,7 @@
 ---
-# This should be include
-- include_tasks: locate_template.yml
-
-- set_fact:
-    heat_template: "{{output_dir}}/{{ env_type }}.{{ guid }}.{{cloud_provider}}_cloud_template"
-  when: heat_template is not defined
-
-- name: Print heat_template
-  debug:
-    var: heat_template
-
-- name: Print heat_template_src
-  debug:
-    var: heat_template_src
 
 - name: OSP Generate heat Template
   template:
-    src: "{{ heat_template_src }}"
-    dest: "{{ heat_template }}"
-  tags:
-    - aws_infrastructure_deployment
-    - gen_cf_template
+    src: templates/cloud_template.j2
+    dest: "{{ heat_template_dest }}"
 
-######################### Copy CF Template to S3 if too big
-- name: Stat heat template
-  stat:
-    path: "{{ heat_template }}"
-  register: stat_template
-  tags:
-    - aws_infrastructure_deployment
-    - gen_cf_template
-
-######################### Validate Heat Template
-#
-# - name: validate heat template (local)
-#   environment:
-#     AWS_ACCESS_KEY_ID: "{{aws_access_key_id}}"
-#     AWS_SECRET_ACCESS_KEY: "{{aws_secret_access_key}}"
-#     AWS_DEFAULT_REGION: "{{aws_region_final|d(aws_region)}}"
-#   command: >-
-#     aws heat validate-template
-#     --region {{ aws_region_final | d(aws_region) | default(region) | default('us-east-1')}}
-#     --template-body file://{{ heat_template }}
-#   changed_when: false
-#   register: heat_validation
-#   until: heat_validation is succeeded
-#   retries: "{{ heat_retries }}"
-#   delay: 20
-#   tags:
-#     - aws_infrastructure_deployment
-#     - validate_cf_template
-#   when: stat_template.stat.size <= 51200
-
-######################### Launch CF Template
