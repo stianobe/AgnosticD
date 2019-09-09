@@ -72,6 +72,15 @@ tower_user_accounts:                                      #Define users you want
 #   - user: test3
 #   - user: test4
 #     lastname: four
+tower_credentials:
+  - name: babylon-tower-credential
+    username: babylon
+    password: changeme
+    description: Babylon Tower Credential
+    organization: gpte
+    type: tower
+    state: present
+    host: localhost
 
 tower_organization:
   - name: gpte
@@ -152,6 +161,8 @@ tower_job_templates:
     playbook: job-runner.yml
     inventory: empty-inventory
     become: yes
+
+
 
 # Tower settings
 tower_setting_params:
