@@ -58,21 +58,21 @@ tower_organization:           #
 #####Isolated Nodes related variables
 
 worker_instance_count: 1              # Set 0 to not to provision worker(isolated) nodes.
-target_regions:                      # Set target regions for worker nodes 
-  - name: emea
-  - name: apac
+#target_regions:                      # Set target regions for worker nodes 
+#  - name: emea
+#  - name: apac
 tower_inventories:                    # Set for creating tower inventories 
   - name: empty-inventory-default
     description: "Empty inventory"
     organization: gpte
-  - name: empty-inventory-emea
-    description: emea
-    organization: gpte
-    instance_group: emea
-  - name: empty-inventory-apac
-    description: apac
-    organization: gpte
-    instance_group: apac
+#  - name: empty-inventory-emea
+#    description: emea
+#    organization: gpte
+#    instance_group: emea
+#  - name: empty-inventory-apac
+#    description: apac
+#    organization: gpte
+#    instance_group: apac
     
 
 
