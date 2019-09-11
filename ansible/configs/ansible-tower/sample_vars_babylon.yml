@@ -125,7 +125,7 @@ tower_job_templates:
     project: babylon
     playbook: "job-runner.yml"
     become: yes
-    inventory: empty-inventory
+    inventory: empty-inventory-default
 
 # Tower settings related vars
 tower_setting_params:
