@@ -1,5 +1,4 @@
 ---
-# - import_playbook: ec2_pre_checks.yml
 
 - name: Build Openstack Environment
   hosts: localhost
@@ -44,4 +43,4 @@
         parameters:
           guid: "{{ guid }}"
           keypair_name: "student_key"
-
+      register: deployed_stack
