@@ -307,7 +307,7 @@ Resources:
 {% endfor %}
 {% endfor %}
 
-{% if worker_instance_count > 0 and target_regions is defined %}
+{% if worker_instance_count > 0 %}
 {% for worker_region in target_regions %}
 {% for instance in instances_worker %}
 {% if instance['dns_loadbalancer'] | d(false) | bool
@@ -339,6 +339,7 @@ Resources:
             - PublicIp
 {% endfor %}
 {% endif %}
+
 {% for c in range(1,(instance['count'] |int)+1) %}
   {{instance['name']}}{{loop.index}}{{worker_region['name']}}:
     Type: "AWS::EC2::Instance"
@@ -428,7 +429,6 @@ Resources:
             - "Fn::GetAtt":
               - {{instance['name']}}{{loop.index}}{{worker_region['name']}}
               - PrivateIp
-{% endif %}
 
 {% if instance['public_dns'] %}
   {{instance['name']}}{{loop.index}}{{worker_region['name']}}EIP:
@@ -463,11 +463,10 @@ Resources:
             - {{instance['name']}}{{loop.index}}.{{worker_region['name']}}
             - PublicIp
 {% endif %}
+{% endfor %}
+{% endfor %}
+{% endfor %}
 {% endif %}
-{% endfor %}
-{% endfor %}
-{% endfor %}
-
 
   {% if secondary_stack is not defined %}
   Route53User:

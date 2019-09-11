@@ -6,40 +6,90 @@ Alternative Contacts: Tony Kay, tok@redhat.com,
 
 == Overview
 
-ansible-tower config was initially created for the babylon Project to deploy Ansible Tower and worker ndoes (isolated nodes)
+ansible-tower config was initially created for the babylon Project to deploy Ansible Tower and worker nodes (isolated nodes)
 
 
-+
-[source,yaml]
-----
-deploy_tower_homework: true
-----
+== Roles Included in `env_vars.yml`
 
-== NOTES
+. tower-copy-ssh
 
-. There are 2 sets of deployer scripts:
-**
-**
-. There are 2 sets of secrets files:
-**
-**
+Role to copy ssh keys to connect to AWS instances from tower/worker nodes. The ssh public key needs to be available in all the AWS regions. Please use aws-cli or AWS console to copy the keys before you start running `dark-tower` scripts.
 
-The "homework" lab requires additional secrets over and above the usual cloud (AWS)
-credentails and repo path. These are traditionally stored on the admin host and
-can be located via the relevant deployer scripts.
+.. Variable needed
 
+key_local_path: "~/.ssh/{{key_name}}.pem"
 
-== Review the Env_Type variable file
+.. For example
 
-* This file link:./env_vars.yml[./env_vars.yml] contains all the variables you
- need to define to control, or customize, the deployment of your environment. In
-normal usage this should not need to be touched or ammended and one-off changes
-can be tested by passing vars or var files with `-e` or `-e @my_version_vars.yml`.
+key_local_path: "~/.ssh/ocpkey.pem"
 
+. tower-license-injector
 
-== Secrets
+Role to setup Ansible Tower License. Set the tower licencse in the same format. Do not forget to add "eula_accepted: true", else the the process of setting us license will fail.
 
-As noted above a deploy of the normal lab requires just 3
+.. Variable Needed
+
+# tower_license: >                   
+#   {
+#     "eula_accepted": true,
+#     "company_name": "Red Hat",
+#     "contact_email": "name@redhat.com",
+#     "contact_name": "some person"
+#     "hostname": "70a415ef832159a36413fa599",
+#     "instance_count": 50,
+#     "license_date": 16581423619,
+#     "license_key":
+#     "eea1b84d1e39cfEXAMPLE5739066069e60c6d0aEXAMPLE2c29cc61b2aEXAMPLE",
+#     "license_type": "enterprise",
+#     "subscription_name": "Ansible Tower by Red Hat (50 Managed Nodes), RHT Internal",
+#     "trial": true
+#   }
+
+. cleanup-tower-default
+
+Role to remove default(demo) project and inventories.
+
+. tower-settings-update
+
+Role to global tower settings:
+
+.. Variable Needed
+
+tower_setting_params:
+  functionality1: "VALUE1"
+  functionality2: "VALUE2"
+
+.. For example
+
+tower_setting_params:
+  AWX_PROOT_BASE_PATH: "/tmp"
+  AWX_PROOT_SHOW_PATHS: "'/var/lib/awx/projects/', '/tmp'"
+
+. tower-pip-packages
+
+Role to update python venv on tower/worker nodes.
+
+# Path of Virtual Env for update
+tower_update_venv: /var/lib/awx/venv/ansible
+
+# Pip packages with version which needs to be updated for venv
+pip_requirements: 
+  - boto==2.49.0
+  - boto3==1.9.200
+  - awscli==1.16.210
+  - ansible-tower-cli==3.3.6
+
+. tower-user-create
+
+Role to create tower users 
+
+  - tower-org-create
+  - tower-credential-create
+  - tower-project-create
+  - tower-inventory-create
+  - tower-job-template-create
+  - tower-babylon-job-runner
+
 
 == Running Ansible Playbook
 

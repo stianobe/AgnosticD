@@ -16,4 +16,8 @@
   loop: "{{ tower_projects }}"
   tags:
     - tower-project-create
+- pause:
+    seconds: 40
+  tags:
+    - tower-project-create
 
