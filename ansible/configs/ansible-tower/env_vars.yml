@@ -447,17 +447,3 @@ default_workloads:
 #   - tower-inventory-create
 #   - tower-job-template-create
 
-tower_license: >
-  {
-    "eula_accepted": true,
-    "company_name": "Red Hat", 
-    "contact_email": "tok@redhat.com", 
-    "contact_name": "Tony Kay", 
-    "hostname": "7f66ae09820a45ef8f1554d6413fa599", 
-    "instance_count": 50, 
-    "license_date": 1581523619, 
-    "license_key": "eea1b84d1e39cfc92a4d25739066069e60c6d02b7535c29cc61b2a2a27acbe75", 
-    "license_type": "enterprise", 
-    "subscription_name": "Ansible Tower by Red Hat (50 Managed Nodes), RHT Internal", 
-    "trial": true
-  }
