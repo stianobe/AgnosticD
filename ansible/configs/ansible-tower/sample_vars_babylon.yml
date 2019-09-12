@@ -51,7 +51,7 @@ software_to_deploy: tower              # Define tower to install tower or none t
 #     "trial": true
 #   }
 
-tower_organization:           # 
+tower_organization:
   - name: gpte
   - name: openshiftbu
 
