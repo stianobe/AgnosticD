@@ -1,7 +1,6 @@
 - name: Copy Tower License File
-  copy:
-    content: "{{ tower_license | from_json }}"
-    content: "{{ tower_license | from_json }}"
+  get_url:
+    url: http://www.opentlc.com/download/license.txt 
     dest: /root/license.txt
   tags:
       - tower-license-injector
