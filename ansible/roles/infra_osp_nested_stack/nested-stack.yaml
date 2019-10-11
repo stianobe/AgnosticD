@@ -1,0 +1,144 @@
+heat_template_version: 2016-10-14
+
+description: Three-Tier-App
+
+parameters:
+
+  guid:
+    type: string
+
+  provider_network:
+    type: string
+    default: external
+
+  keypair_name:
+    type: string
+    default: student_key
+
+  rhel_image:
+    type: string
+    default: rhel-server-7.7-password
+
+resources:
+  network_private:
+    type: OS::Neutron::Net
+    properties:
+      name:
+        list_join: [ '-', [ { get_param: guid }, 'private' ]]
+      shared: false
+
+  subnet_private:
+    type: OS::Neutron::Subnet
+    properties:
+        name:
+            list_join: [ '-', [ { get_param: guid }, 'private' ]]
+        network_id: { get_resource: network_private }
+        cidr: 192.168.2.0/24
+        dns_nameservers: [ "8.8.8.8" ]
+        gateway_ip: 192.168.2.1
+        allocation_pools:
+        -  start: 192.168.2.10
+           end: 192.168.2.99
+
+  router:
+    type: OS::Neutron::Router
+    properties:
+        name:
+           list_join: [ '-', [ { get_param: guid }, 'router' ]]
+        external_gateway_info:
+            network: { get_param: provider_network }
+
+  router_private_interface:
+    type: OS::Neutron::RouterInterface
+    properties:
+        router: { get_resource: router }
+        subnet: { get_resource: subnet_private }
+
+  security_group:
+    type: OS::Neutron::SecurityGroup
+    properties:
+        name:
+          list_join: [ '-', [ { get_param: guid }, 'sg' ]]
+        description: Ping and SSH Access
+        rules:
+          - protocol: icmp
+          - protocol: tcp
+            port_range_min: 22
+            port_range_max: 22
+          - protocol: tcp
+            port_range_min: 80
+            port_range_max: 80
+          - protocol: tcp
+            port_range_min: 443
+            port_range_max: 443
+
+  bastion:
+    type: OS::Heat::ResourceGroup
+    depends_on: router
+    properties:
+      count: 3
+      resource_def:
+        type: OS::Nova::Server
+        properties:
+          name: bastion_%index%
+          image: {get_param: rhel_image }
+          key_name: student_key
+          flavor: m1.small
+          networks:
+            - network: { get_resource: network_private }
+
+  frontend:
+    type: OS::Heat::ResourceGroup
+    properties:
+      count: 1
+      resource_def:
+        type: OS::Nova::Server
+        properties:
+          name: frontend_%index%
+          image: { get_param: rhel_image }
+          key_name: student_key
+          flavor: m1.small
+          networks:
+            - network: { get_resource: network_private }
+
+  app:
+    type: OS::Heat::ResourceGroup
+    properties:
+      count: 2
+      resource_def:
+        type: OS::Nova::Server
+        properties:
+          name: app_%index%
+          image: { get_param: rhel_image }
+          key_name: student_key
+          flavor: m1.small
+          networks:
+            - network: { get_resource: network_private }
+
+  appdb:
+    type: OS::Heat::ResourceGroup
+    properties:
+      count: 2
+      resource_def:
+        type: OS::Nova::Server
+        properties:
+          name: appdb_%index%
+          image: { get_param: rhel_image }
+          key_name: student_key
+          flavor: m1.small
+          networks:
+            - network: { get_resource: network_private }
+
+  support:
+    type: OS::Heat::ResourceGroup
+    properties:
+      count: 1
+      resource_def:
+        type: OS::Nova::Server
+        properties:
+          name: support_%index%
+          image: { get_param: rhel_image }
+          key_name: student_key
+          flavor: m1.small
+          networks:
+            - network: { get_resource: network_private }
