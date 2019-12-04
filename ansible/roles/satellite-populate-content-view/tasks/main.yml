@@ -9,4 +9,4 @@
 
 - name: print ID of required repos
   debug:
-    var: wanted_repos.stdout_lines
+    var: required_repo_ids.stdout_lines
