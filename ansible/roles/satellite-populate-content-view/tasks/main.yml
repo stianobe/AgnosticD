@@ -1,0 +1,12 @@
+---
+- name: Grab ID of required repos
+  shell: >-
+    hammer --output csv
+    repository list
+    --organization "{{org}}" | grep "{{item}}"
+  register: required_repo_ids
+  loop: wanted_repos
+
+- name: print ID of required repos
+  debug:
+    var: wanted_repos.stdout_lines
