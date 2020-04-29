@@ -1,0 +1,31 @@
+---
+become_override: False
+
+# three_scale_multitenant: >-
+#   {{ three_scale_multitenant_defaults | combine(
+#       three_scale_multitenant_vars | default( {} ),
+#       three_scale_multitenant_secrets | default( {} ), 
+#       recursive=true)
+#   }}
+
+# Quotas for shared cluster
+three_scale_multitenant_quota_requests_cpu: 20
+three_scale_multitenant_quota_limits_cpu: 30
+three_scale_multitenant_quota_requests_memory: '20Gi'
+three_scale_multitenant_quota_limits_memory: '30Gi'
+three_scale_multitenant_quota_configmaps: 15
+three_scale_multitenant_quota_pods: 30
+three_scale_multitenant_quota_persistentvolumeclaims: 10
+three_scale_multitenant_quota_services: 150
+three_scale_multitenant_quota_secrets: 150
+three_scale_multitenant_quota_requests_storage: '40Gi'
+
+# User and namespace for the admin
+three_scale_multitenant_amp_admin_id: api0
+three_scale_multitenant_api_manager_ns: "{{ guid }}-{{ three_scale_multitenant_amp_admin_id }}"
+
+# Red Hat Registry credentials for pulling images
+three_scale_multitenant_rht_registry_user: FROM_SECRET
+three_scale_multitenant_rht_registry_password: FROM_SECRET
+
+three_scale_multitenant_template: https://raw.githubusercontent.com/3scale/3scale-amp-openshift-templates/2.8.0.GA/amp/amp.yml

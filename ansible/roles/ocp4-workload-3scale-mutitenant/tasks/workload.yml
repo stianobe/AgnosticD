@@ -1,0 +1,54 @@
+---
+- name: Verify user is cluster admin
+  command: oc auth can-i get nodes
+  register: r_user_can_i
+
+- name: Verify user is cluster admin
+  assert:
+    that: r_user_can_i.stdout == "yes"
+
+- name: Check if API Manager is deployed
+  debug:
+    msg: "TODO"
+
+- name: Create project for API Manager
+  k8s:
+    state: present
+    definition:
+      kind: Project
+      apiVersion: project.openshift.io/v1
+      metadata:
+        name: "{{ three_scale_multitenant_api_manager_ns }}"
+        annotations:
+          openshift.io/requester: "{{ three_scale_multitenant_amp_admin_id }}"
+
+- name: Enable 3scale service discovery
+  k8s:
+    state: present
+    definition:
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        name: view
+      subjects:
+      - kind: ServiceAccount
+        name: default
+        namespace: "{{ three_scale_multitenant_api_manager_ns }}"
+
+- name: Create limitrange for API Manager project
+  k8s:
+    state: present
+    definition: "{{ lookup('template', 'limitrange.yaml.j2') }}"
+
+- name: Create 3Scale image pull secret
+  command: >-
+    oc create secret docker-registry threescale-registry-auth \
+    --docker-server=registry.redhat.io \
+    --docker-username={{ three_scale_multitenant_rht_registry_user }} \
+    --docker-password={{ three_scale_multitenant_rht_registry_password }} \
+    -n {{ three_scale_multitenant_api_manager_ns }}
+
+- name: Download 3Scale template
+  get_url:
+    url: "{{ three_scale_multitenant_template }}"
+    dest:

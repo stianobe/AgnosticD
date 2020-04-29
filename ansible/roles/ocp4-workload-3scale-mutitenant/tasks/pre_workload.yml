@@ -1,0 +1,43 @@
+---
+
+# - name: Set up 3scale_multitenant combined dictionary
+#   set_fact:
+#     three_scale_multitenant: |
+#       {{ three_scale_multitenant_defaults
+#        | combine(three_scale_multitenant_vars | default( {} ),
+#                  three_scale_multitenant_secrets | default( {} ), recursive=true )
+#       }}
+
+# - name: Print combined role variables
+#   debug:
+#     var: three_scale_multitenant
+#     verbosity: 2
+
+- name: Create cluster quota
+  k8s:
+    state: present
+    definition:
+      apiVersion: quota.openshift.io/v1
+      kind: ClusterResourceQuota
+      metadata:
+        name: clusterquota-{{ three_scale_multitenant_amp_admin_id }}
+      spec:
+        quota:
+          hard:
+            requests.cpu: "{{ three_scale_multitenant_quota_requests_cpu }}"
+            limits.cpu: "{{ three_scale_multitenant_quota_limits_cpu }}"
+            requests.memory: "{{ three_scale_multitenant_quota_requests_memory }}"
+            limits.memory: "{{ three_scale_multitenant_quota_limits_memory }}"
+            configmaps: "{{ three_scale_multitenant_quota_configmaps }}"
+            pods: "{{ three_scale_multitenant_quota_pods }}"
+            persistentvolumeclaims: "{{ three_scale_multitenant_quota_persistentvolumeclaims }}"
+            services: "{{ three_scale_multitenant_quota_services }}"
+            secrets: "{{ three_scale_multitenant_quota_secrets }}"
+            requests.storage: "{{ three_scale_multitenant_quota_requests_storage }}"
+        selector:
+          annotations:
+            openshift.io/requester: "{{ three_scale_multitenant_amp_admin_id }}"
+
+- name: pre_workload Tasks Complete
+  debug:
+    msg: "Pre-Software checks completed successfully"
