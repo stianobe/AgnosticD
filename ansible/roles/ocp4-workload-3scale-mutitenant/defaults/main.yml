@@ -1,5 +1,6 @@
 ---
 become_override: False
+silent: False
 
 # three_scale_multitenant: >-
 #   {{ three_scale_multitenant_defaults | combine(
@@ -7,6 +8,9 @@ become_override: False
 #       three_scale_multitenant_secrets | default( {} ), 
 #       recursive=true)
 #   }}
+
+# OCP environment
+three_scale_multitenant_ocp_apps_domain: apps..{{ ocp4_base_domain }}
 
 # Quotas for shared cluster
 three_scale_multitenant_quota_requests_cpu: 20
@@ -25,7 +29,25 @@ three_scale_multitenant_amp_admin_id: api0
 three_scale_multitenant_api_manager_ns: "{{ guid }}-{{ three_scale_multitenant_amp_admin_id }}"
 
 # Red Hat Registry credentials for pulling images
-three_scale_multitenant_rht_registry_user: FROM_SECRET
-three_scale_multitenant_rht_registry_password: FROM_SECRET
+three_scale_multitenant_dockerconfigjson: FROM_SECRET
 
-three_scale_multitenant_template: https://raw.githubusercontent.com/3scale/3scale-amp-openshift-templates/2.8.0.GA/amp/amp.yml
+three_scale_multitenant_source_template: https://raw.githubusercontent.com/3scale/3scale-amp-openshift-templates/2.8.0.GA/amp/amp.yml
+
+three_scale_multitenant_workdir: $HOME/3scale
+three_scale_multitenant_working_template: "{{ three_scale_multitenant_workdir }}/amp.yml"
+
+# Credentials for 3Scale deployment
+three_scale_multitenant_amp_admin_passwd: admin
+three_scale_multitenant_amp_master_passwd: master
+three_scale_multitenant_master_access_token: wtqhhsly
+three_scale_multitenant_default_tenant_username: t1
+three_scale_multitenant_default_tenant_name: "{{ three_scale_multitenant_default_tenant_username }}-{{ three_scale_multitenant_api_manager_ns }}"
+three_scale_multitenant_default_tenant_access_token: 3832cnj371woiduh
+
+# SMTP Settings
+three_scale_multitenant_smtp_host: "smtp.sendgrid.net"
+three_scale_multitenant_smtp_port: 587
+three_scale_multitenant_smtp_authentication: plain
+three_scale_multitenant_smtp_userid: FROM_SECRET
+three_scale_multitenant_smtp_passwd: FROM_SECRET
+three_scale_multitenant_smtp_domain: "redhat.com"

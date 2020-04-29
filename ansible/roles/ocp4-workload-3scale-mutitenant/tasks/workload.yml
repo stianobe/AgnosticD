@@ -41,14 +41,226 @@
     definition: "{{ lookup('template', 'limitrange.yaml.j2') }}"
 
 - name: Create 3Scale image pull secret
-  command: >-
-    oc create secret docker-registry threescale-registry-auth \
-    --docker-server=registry.redhat.io \
-    --docker-username={{ three_scale_multitenant_rht_registry_user }} \
-    --docker-password={{ three_scale_multitenant_rht_registry_password }} \
-    -n {{ three_scale_multitenant_api_manager_ns }}
+  k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: threescale-registry-auth
+        namespace: "{{ three_scale_multitenant_api_manager_ns }}"
+      data:
+        .dockerconfigjson: "{{ three_scale_multitenant_dockerconfigjson }}"
+      type: kubernetes.io/dockerconfigjson
+
+- name: Create a working directory
+  file:
+    path: "{{ three_scale_multitenant_workdir }}"
+    state: directory
 
 - name: Download 3Scale template
   get_url:
-    url: "{{ three_scale_multitenant_template }}"
-    dest:
+    url: "{{ three_scale_multitenant_source_template }}"
+    dest: "{{ three_scale_multitenant_working_template }}"
+    force: true
+
+- name: Place all deployments in a paused state
+  replace:
+    path: "{{ three_scale_multitenant_working_template }}"
+    regexp: "{{ item.find }}"
+    replace: "{{ item.replace }}"
+  loop:
+  - { thing: 'replicas', find: '(replicas: 1\n)', replace: '\1    paused: true\n'}
+  - { thing: 'memory', find: '(memory: 32Gi)', replace: 'memory: 6Gi'}
+  - { thing: 'storage', find: '(ReadWriteMany)', replace: 'ReadWriteOnce'}
+  loop_control: 
+    label: "{{ item.thing }}"
+
+- name: Check SMTP vars before updating
+  assert:
+    that: 
+    - "{{ item }} != 'FROM_SECRET'"
+    fail_msg: "Your SMTP credentials are not set"
+  loop:
+  - three_scale_multitenant_smtp_userid
+  - three_scale_multitenant_smtp_passwd
+
+- name: Create 3Scale API Management Platform objects in OpenShift
+  command: >-
+    oc new-app -f {{ three_scale_multitenant_working_template }}
+    -p "MASTER_NAME={{ three_scale_multitenant_api_manager_ns }}-master"
+    -p "MASTER_PASSWORD={{ three_scale_multitenant_amp_master_passwd }}"
+    -p "MASTER_ACCESS_TOKEN={{ three_scale_multitenant_master_access_token }}"
+    -p "TENANT_NAME={{ three_scale_multitenant_default_tenant_name  }}"
+    -p "ADMIN_PASSWORD={{ three_scale_multitenant_amp_admin_passwd }}"
+    -p "ADMIN_ACCESS_TOKEN={{ three_scale_multitenant_default_tenant_access_token }}"
+    -p "WILDCARD_DOMAIN={{ three_scale_multitenant_ocp_apps_domain }}"
+    -n "{{ three_scale_multitenant_api_manager_ns }}"
+  register: r_new_app_output
+
+- name: Dump new-app output
+  debug:
+    var: r_new_app_output
+    verbosity: 2
+
+- name: Update SMTP Secret
+  k8s:
+    state: present
+    definition: "{{ lookup('template', 'system-smtp.j2') }}"
+
+- name: Resume storage tier DeploymentConfigs
+  command: >-
+    oc rollout resume dc/{{ item }} -n {{ three_scale_multitenant_api_manager_ns }}
+  loop:
+  - backend-redis
+  - system-memcache
+  - system-mysql
+  - system-redis
+  - zync-database
+
+- name: Wait for storage tier DeploymentConfigs to finish
+  k8s_info:
+    api_version: apps.openshift.io/v1
+    kind: DeploymentConfig
+    name: "{{ item }}"
+    namespace: "{{ three_scale_multitenant_api_manager_ns }}"
+  register: r_deployment_status
+  delay: 30
+  retries: 10
+  until: r_deployment_status | json_query(ready_replicas_query) | bool
+  vars:
+    ready_replicas_query: >-
+      resources[].status.conditions[?type=='Available'][].status|[0]
+  loop:
+  - backend-redis
+  - system-memcache
+  - system-mysql
+  - system-redis
+  - zync-database
+
+- name: Resume backend listener DeploymentConfigs
+  command: >-
+    oc rollout resume dc/{{ item }} -n {{ three_scale_multitenant_api_manager_ns }}
+  loop:
+  - backend-listener
+  - backend-worker
+
+- name: Wait for backend listener DeploymentConfigs to finish
+  k8s_info:
+    api_version: apps.openshift.io/v1
+    kind: DeploymentConfig
+    name: "{{ item }}"
+    namespace: "{{ three_scale_multitenant_api_manager_ns }}"
+  register: r_deployment_status
+  delay: 30
+  retries: 10
+  until: r_deployment_status | json_query(ready_replicas_query) | bool
+  vars:
+    ready_replicas_query: >-
+      resources[].status.conditions[?type=='Available'][].status|[0]
+  loop:
+  - backend-listener
+  - backend-worker
+
+- name: Resume system tier DeploymentConfigs
+  command: >-
+    oc rollout resume dc/{{ item }} -n {{ three_scale_multitenant_api_manager_ns }}
+  loop:
+  - system-app
+
+- name: Wait for system tier DeploymentConfigs to finish
+  k8s_info:
+    api_version: apps.openshift.io/v1
+    kind: DeploymentConfig
+    name: "{{ item }}"
+    namespace: "{{ three_scale_multitenant_api_manager_ns }}"
+  register: r_deployment_status
+  delay: 30
+  retries: 10
+  until: r_deployment_status | json_query(ready_replicas_query) | bool
+  vars:
+    ready_replicas_query: >-
+      resources[].status.conditions[?type=='Available'][].status|[0]
+  loop:
+  - system-app
+
+- name: Resume utility tier DeploymentConfigs
+  command: >-
+    oc rollout resume dc/{{ item }} -n {{ three_scale_multitenant_api_manager_ns }}
+  loop:
+  - system-sidekiq
+  - system-sphinx
+  - backend-cron
+
+- name: Wait for utility tier DeploymentConfigs to finish
+  k8s_info:
+    api_version: apps.openshift.io/v1
+    kind: DeploymentConfig
+    name: "{{ item }}"
+    namespace: "{{ three_scale_multitenant_api_manager_ns }}"
+  register: r_deployment_status
+  delay: 30
+  retries: 10
+  until: r_deployment_status | json_query(ready_replicas_query) | bool
+  vars:
+    ready_replicas_query: >-
+      resources[].status.conditions[?type=='Available'][].status|[0]
+  loop:
+  - system-sidekiq
+  - system-sphinx
+  - backend-cron
+
+- name: Resume gateway tier DeploymentConfigs
+  command: >-
+    oc rollout resume dc/{{ item }} -n {{ three_scale_multitenant_api_manager_ns }}
+  loop:
+  - apicast-staging
+  - apicast-production
+
+- name: Wait for gateway tier DeploymentConfigs to finish
+  k8s_info:
+    api_version: apps.openshift.io/v1
+    kind: DeploymentConfig
+    name: "{{ item }}"
+    namespace: "{{ three_scale_multitenant_api_manager_ns }}"
+  register: r_deployment_status
+  delay: 30
+  retries: 10
+  until: r_deployment_status | json_query(ready_replicas_query) | bool
+  vars:
+    ready_replicas_query: >-
+      resources[].status.conditions[?type=='Available'][].status|[0]
+  loop:
+  - apicast-staging
+  - apicast-production
+
+- name: Resume zync tier DeploymentConfigs
+  command: >-
+    oc rollout resume dc/{{ item }} -n {{ three_scale_multitenant_api_manager_ns }}
+  loop:
+  - zync
+  - zync-que
+
+- name: Wait for zync tier DeploymentConfigs to finish
+  k8s_info:
+    api_version: apps.openshift.io/v1
+    kind: DeploymentConfig
+    name: "{{ item }}"
+    namespace: "{{ three_scale_multitenant_api_manager_ns }}"
+  register: r_deployment_status
+  delay: 30
+  retries: 10
+  until: r_deployment_status | json_query(ready_replicas_query) | bool
+  vars:
+    ready_replicas_query: >-
+      resources[].status.conditions[?type=='Available'][].status|[0]
+  loop:
+  - zync
+  - zync-que
+
+# Leave this as the last task in the playbook.
+# --------------------------------------------
+- name: workload tasks complete
+  debug:
+    msg: "Workload Tasks completed successfully."
+  when: not silent|bool
