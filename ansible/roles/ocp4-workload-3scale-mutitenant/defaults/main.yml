@@ -10,7 +10,8 @@ silent: False
 #   }}
 
 # OCP environment
-three_scale_multitenant_ocp_apps_domain: apps..{{ ocp4_base_domain }}
+ocp4_base_domain: cluster-nstephan-sm.nstephan-sm.example.opentlc.com 
+three_scale_multitenant_ocp_apps_domain: apps.{{ ocp4_base_domain }}
 
 # Quotas for shared cluster
 three_scale_multitenant_quota_requests_cpu: 20
@@ -35,6 +36,7 @@ three_scale_multitenant_source_template: https://raw.githubusercontent.com/3scal
 
 three_scale_multitenant_workdir: $HOME/3scale
 three_scale_multitenant_working_template: "{{ three_scale_multitenant_workdir }}/amp.yml"
+three_scale_multitenant_tenant_output_log: "{{ three_scale_multitenant_workdir }}/tenant_provisioning.log"
 
 # Credentials for 3Scale deployment
 three_scale_multitenant_amp_admin_passwd: admin
@@ -51,3 +53,9 @@ three_scale_multitenant_smtp_authentication: plain
 three_scale_multitenant_smtp_userid: FROM_SECRET
 three_scale_multitenant_smtp_passwd: FROM_SECRET
 three_scale_multitenant_smtp_domain: "redhat.com"
+
+# Tenant things
+three_scale_multitenant_create_tenant_url: >
+  "https://{{ three_scale_multitenant_api_manager_ns }}-master.{{ three_scale_multitenant_ocp_apps_domain }}/master/api/providers.xml"
+three_scale_multitenant_delete_tenant_sub_url: >
+  "https://{{ three_scale_multitenant_api_manager_ns }}-master.{{ three_scale_multitenant_ocp_apps_domain }}/master/api/providers/"

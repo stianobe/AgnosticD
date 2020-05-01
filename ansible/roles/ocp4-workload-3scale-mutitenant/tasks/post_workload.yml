@@ -2,6 +2,14 @@
 # Implement your Post Workload deployment tasks here
 # --------------------------------------------------
 
+- name: Create skeleton output file for tenant information
+  lineinfile: 
+    line: "OCP user id\t3scale admin URL\tAPI admin Id\tAPI admin passwd\tAPI admin access token"
+    path: "{{ three_scale_multitenant_tenant_output_log }}"
+    create: yes
+    state: present
+
+- Create 
 
 
 

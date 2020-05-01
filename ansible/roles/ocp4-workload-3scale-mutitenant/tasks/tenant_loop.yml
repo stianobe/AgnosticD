@@ -3,6 +3,7 @@
 # The following is only appropriate when create generic tenants whose names are sequential
 # The following is skipped when creating a "named" tenant, ie; openbanking-dev  
 - block:
+  when: item > 0
   - set_fact:
       counter: "{{ item }}"   
 
@@ -28,8 +29,6 @@
   - set_fact:
       gw_project_name: "{{ ocpAdminId }}-gw"
 
-  when: item > 0
-
 # Wildcard gateway facts
 - set_fact:
     GW_WILDCARD_DOMAIN: "wc-router.{{ ocpAdminId }}.{{ ocp_apps_domain }}"
@@ -42,6 +41,7 @@
 #  ################################             Create Tenant            ##################################### #
 
 - block:
+  when: create_or_delete_tenants == "create"
     - name: "{{ocpAdminId}}      1)  **********   TENANT CREATION  **********"
       set_fact:
         tenantAdminEmail: "{{adminEmailUser}}%2B{{ counter }}%40{{adminEmailDomain}}"
@@ -112,8 +112,6 @@
         path: "{{tenant_output_dir}}/{{tenant_provisioning_results_file}}"
         create: yes
         state: present
-
-  when: create_or_delete_tenants == "create"
 
 #  ########################################################################################################## #
  
