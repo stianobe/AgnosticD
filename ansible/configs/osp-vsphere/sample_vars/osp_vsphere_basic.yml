@@ -1,0 +1,6 @@
+---
+# Mandatory
+cloud_provider: osp
+env_type: osp-vsphere
+software_to_deploy: none
+

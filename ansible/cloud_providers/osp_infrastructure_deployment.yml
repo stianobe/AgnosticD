@@ -84,7 +84,7 @@
 
 - name: Step 001.3 Configure Linux Hosts and Wait for Connection
   hosts:
-    - all:!windows:!network
+    - all:!windows:!network:!esx
   gather_facts: false
   any_errors_fatal: true
   ignore_errors: false
