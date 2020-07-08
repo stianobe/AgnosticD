@@ -1,0 +1,13 @@
+---
+- name: Set up Admin User
+  shell: "oc adm policy add-cluster-role-to-user cluster-admin {{ ocp4_idm_config_admin_user }}"
+  # try for 5 minutes
+  retries: 30
+  delay: 10
+  register: r_setup_admin_user
+  until: r_setup_admin_user is succeeded
+
+- name: Remove kubeadmin User
+  when: ocp4_idm_config_auth_remove_kubeadmin | bool
+  command: oc delete secret kubeadmin -n kube-system
+  ignore_errors: true

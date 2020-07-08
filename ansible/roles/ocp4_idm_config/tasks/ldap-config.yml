@@ -1,0 +1,29 @@
+---
+- name: Check for LDAP Bind Password
+  fail:
+    msg: LDAP Authentication is configured but LDAP BindPassword (bindPassword) is not defined.
+  when: bindPassword is not defined
+
+- name: Get IPA CA Cert
+  get_url:
+    url: "{{ idm_ca_url }}"
+    dest: "/home/{{ ansible_user }}/ipa-ca.crt"
+    mode: ug=rw,o=
+
+- name: Create IPA CA Cert ConfigMap
+  shell: "oc create configmap opentlc-ldap-ca-cert --from-file=ca.crt=/home/{{ ansible_user }}/ipa-ca.crt -n openshift-config"
+  ignore_errors: true
+
+- name: Create LDAP Bind Password Secret
+  shell: "oc create secret generic opentlc-ldap-secret --from-literal=bindPassword=\"{{ bindPassword }}\" -n openshift-config"
+  ignore_errors: true
+
+- name: Upload OAuth Configuration File
+  copy:
+    src: "./files/oauth-opentlc-ldap.yaml"
+    dest: "/home/{{ ansible_user }}/oauth-opentlc-ldap.yaml"
+    owner: "{{ ansible_user }}"
+    mode: ug=rw,o=
+
+- name: Update OAuth Configuration
+  shell: "oc apply -f /home/{{ ansible_user }}/oauth-opentlc-ldap.yaml"

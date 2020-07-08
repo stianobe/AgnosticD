@@ -1,0 +1,15 @@
+---
+- name: Check ocp4_idm_config_type is valid
+  assert:
+    that: ocp4_idm_config_type in ['htpasswd', 'ldap', 'none']
+    fail_msg: >-
+      ocp4_idm_config_type "{{ ocp4_idm_config_type }}" is invalid, must be one of "htpasswd", "ldap" or "none".
+
+- when:
+  - ocp4_idm_config_type != 'none'
+  block:
+  - name: Include tasks for {{ ocp4_idm_config_type }}
+    include_tasks: "{{ ocp4_idm_config_type }}-config.yml"
+
+  - name: Configure admin user
+    include_tasks: admin-user-config.yml

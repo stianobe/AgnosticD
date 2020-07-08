@@ -1,0 +1,14 @@
+---
+ocp4_idm_config_admin_user: "{{ ocp4_admin_user | default(admin_user) | default('opentlc-mgr') }}"
+ocp4_idm_config_type: "{{ install_idm | default('none') }}"
+ocp4_idm_config_auth_remove_kubeadmin: "{{ auth_remove_kubeadmin | default(false) }}"
+ocp4_idm_config_admin_password: "{{ admin_password | default('') }}"
+ocp4_idm_config_admin_password_hash: "{{ admin_password_hash | default('') }}"
+ocp4_idm_config_user_base_name: "{{ user_base_name | default('user') }}"
+ocp4_idm_config_users:
+  andrew: $apr1$dZPb2ECf$ercevOFO5znrynUfUj4tb/
+  karla: $apr1$FQx2mX4c$eJc21GuVZWNg1ULF8I2G31
+ocp4_idm_config_user_password: "{{ user_password | default('') }}"
+ocp4_idm_config_user_password_hash: "{{ user_password_hash | default('') }}"
+ocp4_idm_config_default_user_count: 200
+ocp4_idm_config_user_count_start: "{{ default(1) }}"

@@ -1,0 +1,4 @@
+_ocp4_idm_config_admin_password_hash: "{{ ocp4_idm_config_admin_password_hash | default('$apr1$glFN48wz$dR9w94PGiQL8qZXcXGd0L0' }}"
+_ocp4_idm_config_user_count: "{{ user_count | default(ocp4_idm_config_default_user_count) }}"
+_ocp4_idm_config_user_password_hash: "{{ ocp4_idm_config_user_password_hash | default('$apr1$FmrTsuSa$yducoDpvYq0KEV0ErmwpA1' }}"
+
