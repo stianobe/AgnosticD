@@ -60,6 +60,9 @@ create_unused_security_groups: False
 ## Openshift install vars ##
 ############################
 
+# The name of the cloud where ocp-cluster will be created
+osp_cloud_name: "{{ osp_project_name }}"
+
 openshift_fip_provision: true
 
 kni_ocp_domain: "{{ osp_cluster_dns_zone }}"
