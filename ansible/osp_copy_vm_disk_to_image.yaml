@@ -1,0 +1,44 @@
+- name: Create migration host inventory
+  hosts: localhost
+  connection: local
+  become: false
+  tasks:
+    - name: Block to migrate images
+      block:
+        - name: Create migration host group
+          add_host:
+            name: "{{ import_host }}"
+            group: "migration"
+            bastion: "{{ import_host }}"
+            ansible_user: "opentlc-mgr"
+            remote_user: "opentlc-mgr"
+            ansible_become: true
+            ansible_ssh_private_key_file: "{{ migration_key_path | default(omit) }}"
+
+
+- name: Step 001 Migrating blueprints
+  hosts: migration
+  become: true
+  remote_user: opentlc-mgr
+  gather_facts: true
+  vars_prompt:
+
+   - name: items 
+     prompt: What items you want to upload? list
+  tasks:
+   - name: Convert VM to image
+     become: true
+     environment:
+       OS_AUTH_URL: "{{ osp_auth_url }}"
+       OS_USERNAME: "{{ osp_auth_username }}"
+       OS_PASSWORD: "{{ osp_auth_password }}"
+       OS_PROJECT_NAME: "{{ osp_project | default('admin') }}"
+       OS_PROJECT_DOMAIN_ID: "{{ osp_auth_project_domain }}"
+       OS_USER_DOMAIN_NAME: "{{ osp_auth_user_domain }}"
+       OS_INTERFACE: "{{ osp_interface | default('internal') }}"
+       PATH: "/root/.local/bin:{{ ansible_env.PATH }}"
+       CEPH_CONF: "/etc/ceph/{{ ceph_cluster | default('red') }}.conf"
+     gpte_copy_vm_disk_to_image:
+       project: "{{ osp_project }}"
+       ceph_cluster: "{{ ceph_cluster | default('red') }}"
+       items: "{{ items }}"
