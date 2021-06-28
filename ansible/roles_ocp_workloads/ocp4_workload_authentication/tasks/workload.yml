@@ -106,7 +106,9 @@
       created with password `{{ ocp4_workload_authentication_user_password }}`
 
   - name: Print user information for cluster admin access
-    when: ocp4_workload_authentication_admin_users | length > 0
+    when:
+    - ocp4_workload_authentication_show_user_info | bool
+    - ocp4_workload_authentication_admin_users | length > 0
     agnosticd_user_info:
       msg: >-
         {%- if  ocp4_workload_authentication_admin_users | length == 1 -%}
@@ -118,6 +120,8 @@
         {%- endif -%}
 
   - name: Print user information for each user
+    when:
+    - ocp4_workload_authentication_set_user_data | bool
     agnosticd_user_info:
       user: "{{ ocp4_workload_authentication_htpasswd_user_base }}{{ n }}"
       data:

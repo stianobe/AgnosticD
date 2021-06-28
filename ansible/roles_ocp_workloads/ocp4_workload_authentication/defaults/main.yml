@@ -59,3 +59,7 @@ ocp4_workload_authentication_htpasswd_admin_password_length: 16
 
 # Remove Kubeadmin user upon successful installation of Authentication
 ocp4_workload_authentication_remove_kubeadmin: true
+
+# agnosticd_user_info controls
+ocp4_workload_authentication_set_user_data: true
+ocp4_workload_authentication_show_user_info: true
