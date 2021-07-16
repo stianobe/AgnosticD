@@ -10,14 +10,14 @@
     - mysqlrestore_crd.yml.j2
 
 - name: Remove Docker
-  become: true
+  become: yes
   package:
     name: docker
     state: absent
     use: yum
 
 - name: Remove operator-sdk
-  become: true
+  become: yes
   file:
     path: /usr/local/bin/operator-sdk
     state: absent

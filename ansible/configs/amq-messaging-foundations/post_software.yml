@@ -1,8 +1,8 @@
 ---
 - name: Step 00xxxxx post software
   hosts: bastions
-  become: true
-  gather_facts: false
+  become: yes
+  gather_facts: False
   tasks:
   - debug:
       msg: "Post-Software Steps starting"

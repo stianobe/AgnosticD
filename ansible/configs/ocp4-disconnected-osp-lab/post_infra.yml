@@ -1,4 +1,3 @@
----
 - name: Step 002 Post Infrastructure
   hosts: localhost
   connection: local

@@ -1,7 +1,7 @@
 ---
-become_override: false
+become_override: False
 ocp_username: kubeadmin
-silent: false
+silent: False
 project_name: labguide
 app_name: servicemesh
 ## Homeroom content config - start ##

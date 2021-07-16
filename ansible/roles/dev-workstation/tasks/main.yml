@@ -7,6 +7,7 @@
     - install_openshift_node_packages
 
 
+
 ######################### Install Docker (with storage)
 
 - group:
@@ -22,7 +23,7 @@
     name: "{{desired_user}}"
     shell: /bin/bash
     groups: users,docker
-    append: true
+    append: yes
 
 - file:
     path: "/home/{{desired_user}}"

@@ -4,9 +4,7 @@
   k8s:
     state: present
     definition: "{{ lookup('template', role_path ~ '/templates/clusterresourcequota.j2' ) | from_yaml }}"
-  vars:
-    clusterresourcequota_name: "{{ (ocp_username + '-' + guid) | replace('_','-') }}"
-  when: ocp4_workload_fuse_online_user_needs_quota | default(false) | bool
+  when: ocp4_workload_fuse_online_user_needs_quota|d(False)|bool
 
 - name: pre_workload Tasks Complete
   debug:

@@ -1,7 +1,7 @@
 ---
-become_override: false
+become_override: False
 ocp_username: opentlc-mgr
-silent: false
+silent: False
 
 ocp4_workload_rhacm_acm_project: "open-cluster-management"
 ocp4_workload_rhacm_acm_release: "release-2.0"

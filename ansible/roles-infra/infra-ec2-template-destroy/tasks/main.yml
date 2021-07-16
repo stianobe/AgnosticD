@@ -19,7 +19,7 @@
   until: cloudformation_result is succeeded
   retries: "{{ cloudformation_retries | d(3) }}"
   delay: "{{ cloudformation_retry_delay | d(60) }}"
-  ignore_errors: true
+  ignore_errors: yes
   when: cloud_provider == 'ec2'
 
 - name: report Cloudformation error

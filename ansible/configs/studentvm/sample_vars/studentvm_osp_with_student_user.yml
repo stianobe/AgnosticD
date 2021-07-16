@@ -1,4 +1,3 @@
----
 # -------------------------------------------------------------------
 # StudentVM on OpenStack. This example creates a student user id
 # on the Student VM. Default is "lab-user" but can be overwritten

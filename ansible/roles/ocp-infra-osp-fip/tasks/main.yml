@@ -24,11 +24,7 @@
 
 - name: Add DNS entry for OpenShift API and ingress
   nsupdate:
-    server: >-
-      {{ osp_cluster_dns_server
-      | ipaddr
-      | ternary(osp_cluster_dns_server, lookup('dig', osp_cluster_dns_server))
-      }}
+    server: "{{ osp_cluster_dns_server }}"
     zone: "{{ osp_cluster_dns_zone }}"
     record: "{{ item.dns }}.cluster-{{ guid }}"
     type: A
@@ -45,3 +41,4 @@
   loop_control:
     label: item.name
   when: openshift_fip_provision
+

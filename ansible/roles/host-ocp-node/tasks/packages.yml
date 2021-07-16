@@ -1,6 +1,5 @@
----
 #vim: set ft=ansible:
-
+---
 - name: install openshift_node packages
   yum:
     state: present
@@ -21,4 +20,4 @@
       - strace
       - tcpdump
   tags:
-    - install_openshift_node_packages
+   - install_openshift_node_packages

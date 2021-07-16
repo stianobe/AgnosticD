@@ -1,6 +1,6 @@
 ---
 - name: Download aws-nuke
-  become: true
+  become: yes
   get_url:
     url: "{{ aws_nuke_binary_url }}"
     dest: /usr/bin/aws-nuke

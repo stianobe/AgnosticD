@@ -1,7 +1,6 @@
 == Author Information
 
-**Author**: Marcos Entenza (mak@redhat.com) (to be removed)
-**Author**: Ricardo Garcia (rgarciac@redhat.com) (new onwer)
+**Author**: Marcos Entenza (mak@redhat.com)
 
 == Overview
 
@@ -14,7 +13,6 @@ image::topology.png[width=100%]
 == Supported Cloud Providers
 
 * OSP
-* AWS
 
 == Review the Env_Type variable file
 

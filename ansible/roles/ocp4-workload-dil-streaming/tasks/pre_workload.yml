@@ -32,11 +32,9 @@
   set_fact:
     console_url: "{{ console_url_r.stdout | trim }}"
 
-- name: Get the cluster ingress config
-  k8s_info:
-    api_version: config.openshift.io/v1
+- name: extract route_subdomain
+  k8s_facts:
     kind: Ingress
-    name: cluster
   register: route_subdomain_r
 
 - name: set the route

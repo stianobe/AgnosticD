@@ -34,7 +34,9 @@
   when: ocp4_workload_quarkus_experienced_elt_create_quota | bool
   k8s:
     state: absent
-    definition: "{{ lookup('template', 'cluster_resource_quota.j2' ) | from_yaml }}"
+    definition: "{{ lookup('template', item ) | from_yaml }}"
+  loop:
+  - ./templates/cluster_resource_quota.j2
 
 # Leave this as the last task in the playbook.
 # --------------------------------------------

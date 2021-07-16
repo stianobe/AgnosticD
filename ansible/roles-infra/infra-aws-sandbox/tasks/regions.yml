@@ -7,7 +7,6 @@
         aws ec2 describe-regions
         --query "Regions[].RegionName"
         --output json --region us-east-1
-        --filter Name=opt-in-status,Values=opt-in-not-required
       register: _regions
       changed_when: false
 

@@ -1,4 +1,3 @@
----
 mig_verify_expected_ns:
 - openshift-migration
 - openshift-storage

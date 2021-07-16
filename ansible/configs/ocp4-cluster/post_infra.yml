@@ -25,7 +25,7 @@
   - name: GCP Post Infrastructure
     when: cloud_provider is match("gcp")
     block:
-    - name: Create secret for SSH Key
+    - name: Create keyvault for SSH Key
       include_role:
         name: infra-gcp-ssh-key
 
@@ -45,7 +45,7 @@
   - name: Azure Post Infrastructure
     when: cloud_provider is match("azure")
     block:
-    - name: Store SSH Key in shared keyvault
+    - name: Create keyvault for SSH Key
       include_role:
         name: infra-azure-ssh-key
 
@@ -64,11 +64,10 @@
       with_items: "{{vm_list}}"
 
     - name: Print Host Information
-      agnosticd_user_info:
+      debug:
         msg: "{{ item }}"
       loop:
-      - "Remote User: {{ remote_user }}"
-      - "RHEL Bastion Host: {{ rhel_remote_host }}"
-      - "Windows Host(s): {{ windows_remote_hosts }}"
-      - "Windows Password: {{ windows_password }}"
-      when: ocp4_cluster_show_access_user_info | bool
+      - "user.info: Remote User: {{ remote_user }}"
+      - "user.info: RHEL Bastion Host: {{ rhel_remote_host }}"
+      - "user.info: Windows Host(s): {{ windows_remote_hosts }}"
+      - "user.info: Windows Password: {{ windows_password }}"

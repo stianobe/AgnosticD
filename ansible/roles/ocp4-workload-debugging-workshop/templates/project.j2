@@ -1,6 +1,11 @@
-apiVersion: v1
-kind: Namespace
+apiVersion: project.openshift.io/v1
+kind: Project
 metadata:
-  labels:
-    control-plane: controller-manager
-  name: workshop-infra
+  annotations:
+    openshift.io/description: ""
+    openshift.io/display-name: "Workshop Infrastructure"
+    openshift.io/requester: "{{ ocp_username }}"
+  name: "{{ workshop_operator_namespace }}"
+spec:
+  finalizers:
+  - kubernetes

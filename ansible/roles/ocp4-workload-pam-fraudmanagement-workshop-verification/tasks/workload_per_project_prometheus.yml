@@ -16,7 +16,7 @@
     url: "https://{{ prom_route.stdout }}"
     method: GET
     validate_certs: false
-    follow_redirects: true
+    follow_redirects: yes
   register: promresult
   retries: "{{ _retry }}"
   delay: "{{ _delay }}"

@@ -9,13 +9,13 @@
   block:
     - name: Verify if AWS Credentials exist on the host
       stat:
-        path: "/home/{{ _certbot_user }}/.aws/credentials"
+        path: "/home/{{ ansible_user }}/.aws/credentials"
       register: aws_credentials_result
       
     - name: Fail if AWS Credentials are not on the host
-      when: aws_credentials_result.stat.exists == False
       fail:
         msg: AWS Credentials are required when requesting certificates for a wildcard domain
+      when: aws_credentials_result.stat.exists == False
 
 - name: Check on DDNS credentials
   when: _certbot_dns_provider is match('rfc2136')
@@ -27,9 +27,9 @@
       register: ddns_credentials_result
 
     - name: Fail if DDNS credentials are missing
-      when: ddns_credentials_result.stat.exists == False
       fail:
         msg: You need a key and secret to update DNS
+      when: ddns_credentials_result.stat.exists == False
 
 - name: Set _certbot_wildcard_certs fact
   set_fact: 
@@ -51,18 +51,20 @@
   # For certbot, certbot-dns-route53 and certbot-dns-rfc2136
   - name: Copy requirements_certbot.txt to target for certbot virtualenv
     copy:
-      src: requirements_certbot.txt
+      src: ./files/requirements_certbot.txt
       dest: /tmp/requirements_certbot.txt
 
-  # Run as _certbot_user in order to set up the correct permissions
+  # The next two commands need to be run as _certbot_user in order to set up the correct permissions
   # Running without will create links to /root/.local/... which won't be readable
   - name: Create Virtualenv Certbot
     become: True
     become_user: "{{ _certbot_user }}"
-    pip:
-      requirements: /tmp/requirements_certbot.txt
-      virtualenv: "{{ _certbot_virtualenv }}"
-      virtualenv_command: /usr/bin/python3 -m venv
+    command: "/usr/local/bin/virtualenv -p /usr/bin/python3 {{ _certbot_virtualenv }}"
+  
+  - name: Install Certbot into Virtualenv
+    become: true
+    become_user: "{{ _certbot_user }}"
+    command: "{{ _certbot_virtualenv }}/bin/pip3 install -r /tmp/requirements_certbot.txt"
   
   - name: Copy certbot script to virtualenv
     template:

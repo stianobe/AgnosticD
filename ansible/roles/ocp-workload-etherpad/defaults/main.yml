@@ -1,7 +1,7 @@
 ---
-become_override: false
+become_override: False
 ocp_username: user-redhat.com
-silent: false
+silent: False
 tmp_dir: /tmp/{{ guid }}
 tmp_kubeconfig: "{{ tmp_dir }}/.kube/config"
 

@@ -15,14 +15,14 @@
   service:
     name: firewalld
     state: started
-    enabled: true
+    enabled: yes
 
 - name: Open Firewall for IdM use
   firewalld:
     service: "{{ item }}"
-    permanent: true
+    permanent: yes
     state: enabled
-    immediate: true
+    immediate: yes
   with_items:
   - ntp
   - http

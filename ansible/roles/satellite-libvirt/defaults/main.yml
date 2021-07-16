@@ -1,4 +1,3 @@
----
 satellite_libvirt_network:
   domain: example.org
   network: '192.168.122.0'

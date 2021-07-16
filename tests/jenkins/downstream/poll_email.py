@@ -6,7 +6,6 @@ import re
 import os
 import sys
 import argparse
-from socket import error as SocketError
 from time import sleep
 
 credentials = os.environ['credentials']
@@ -104,12 +103,6 @@ def wait_email(pattern, time_window):
 
         except imaplib.IMAP4.error as err:
             print("IMAP4 error: {0}".format(err))
-            print("reconnecting")
-            # reconnect
-            disconnect(M)
-            M = connect()
-        except SocketError as err:
-            print("SOCKET error: {0}".format(err))
             print("reconnecting")
             # reconnect
             disconnect(M)

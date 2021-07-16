@@ -4,7 +4,7 @@
 - name: Deploy a student workload role to a student vm
   hosts: all
   become: false
-  gather_facts: false
+  gather_facts: False
   tasks:
   - name: Run student role
     when: studentvm_role is defined

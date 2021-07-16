@@ -16,8 +16,8 @@
 {% endif %}
 {% endfor %}
 
-[gitservers]
-{% for host in groups['gitservers'] %}
+[gitserver]
+{% for host in groups['gitserver'] %}
 {% if cloud_provider == 'ec2' %}
 {{ host }}
 {% elif cloud_provider == 'osp' %}
@@ -28,7 +28,7 @@
 [towerimp:children]
 towers
 servers
-gitservers
+gitserver
 
 [towerimp:vars]
 timeout=60

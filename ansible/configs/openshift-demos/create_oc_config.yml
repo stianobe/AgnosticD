@@ -26,3 +26,4 @@
     - oc_kube_config is defined
     - oc_kube_config is not none
     - oc_kube_config|trim() != ""
+  

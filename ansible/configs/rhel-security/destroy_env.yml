@@ -4,8 +4,8 @@
 - name: Build inventory
   hosts: localhost
   connection: local
-  gather_facts: false
-  become: false
+  gather_facts: False
+  become: no
   tasks:
     - when: cloud_provider == 'ec2'
       block:
@@ -18,17 +18,10 @@
             name: infra-common-ssh-config-generate
           when: "'bastions' in groups"
 
-    - name: Remove bookbag
-      when: bookbag_git_repo is defined
-      include_role:
-        name: bookbag
-      vars:
-        ACTION: destroy
-
 - name: Set ssh config
   hosts: all
   gather_facts: false
-  become: false
+  become: no
   tasks:
     - name: Set facts for remote access
       set_fact:

@@ -1,7 +1,7 @@
 ---
-become_override: false
+become_override: False
 ocp_username: opentlc-mgr
-silent: false
+silent: False
 
 # The channel to subscribe to
 ocp4_workload_servicemesh_channel: "1.0"

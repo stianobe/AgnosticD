@@ -3,11 +3,8 @@ kind: ImageStream
 metadata:
   annotations:
     openshift.io/image.dockerRepositoryCheck: "2019-10-07T14:26:15Z"
-  name: workshop-spark-notebook
-  labels:
-    component.opendatahub.io/name: jupyterhub
-    opendatahub.io/component: "true"
-    opendatahub.io/notebook-image: "true"
+  name: spark-notebook
+  namespace: openshift
 spec:
   lookupPolicy:
     local: false
@@ -15,8 +12,8 @@ spec:
   - annotations: null
     from:
       kind: DockerImage
-      name: {{ ocp4_workload_rhte_analytics_data_ocp_workshop_jupyter_notebook_imagestream_image }}
+      name: quay.io/llasmith/spark-notebook:spark-2.3.2_hadoop-2.8.5
     importPolicy: {}
-    name: {{ ocp4_workload_rhte_analytics_data_ocp_workshop_jupyter_notebook_imagestream_tag }}
+    name: spark-2.3.2_hadoop-2.8.5
     referencePolicy:
       type: Source

@@ -22,7 +22,7 @@ chomped_zone_internal_dns: "{{guid}}.internal"
 __instance_type: "t2.medium"
 # Image ID
 # __image: RHELAMI
-__image: RHEL77GOLD
+__image: RHEL77
 
 security_groups:
 
@@ -97,6 +97,7 @@ instances:
     security_groups:
       - DefaultSG
       - UtilitySG
+
 
 
 ...

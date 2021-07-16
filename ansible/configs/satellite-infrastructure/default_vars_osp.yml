@@ -1,10 +1,9 @@
----
 ################################################################################
 ### OSP Environment variables
 ################################################################################
 
 
-cloud_provider: osp
+cloud_provider: osp                               
 ansible_user: cloud-user
 remote_user: cloud-user
 
@@ -12,13 +11,16 @@ osp_cluster_dns_server: ddns01.opentlc.com
 use_dynamic_dns: true
 osp_project_create: true
 student_name: student
+admin_user: opentlc-mgr
+install_student_user: false
 
-_image: rhel-server-7.7-update-2
-bastion_instance_image: "{{ _image }}"
 bastion_instance_type: 2c2g30d
+satellite_instance_type: 8c32g100d
 
-satellite_instance_type: GLOBAL-CPU_4_Memory_32768_Disk_60_flavor
+_image: rhel-server-7.7-update-2 
+bastion_instance_image: "{{ _image }}"
 satellite_instance_image: "{{ _image }}"
+
 satellite_instance_count: 1
 
 security_groups:
@@ -70,7 +72,9 @@ instances:
     floating_ip: true
     image_id: "{{ bastion_instance_image }}"
     flavor:
-      osp: "{{ bastion_instance_type }}"
+      ec2: "{{bastion_instance_type}}"
+      osp: "{{bastion_instance_type}}"
+      azure: Standard_A2_V2
     security_groups:
       - BastionSG
       - DefaultSG
@@ -83,13 +87,16 @@ instances:
         value: "{{ env_type }}-{{ email }}"
 
   - name: "satellite"
-    count: "{{ satellite_instance_count | default(1) }}"
+    count: "{{satellite_instance_count}}"
     public_dns: true
     floating_ip: true
     image_id: "{{ satellite_instance_image }}"
     flavor:
-      osp: "{{ satellite_instance_type }}"
-    security_groups:
+      ec2: "{{satellite_instance_type}}"
+      osp: "{{satellite_instance_type}}"
+      azure: Standard_A2_V2
+    image_id: "{{ satellite_instance_image }}"
+    security_groups: 
       - SatelliteSG
       - DefaultSG
     tags:
@@ -99,3 +106,6 @@ instances:
         value: "linux"
       - key: "instance_filter"
         value: "{{ env_type }}-{{ email }}"
+
+
+

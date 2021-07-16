@@ -1,8 +1,7 @@
----
 - name: Step 00xxxxx post software
   hosts: support
-  gather_facts: false
-  become: true
+  gather_facts: False
+  become: yes
   tasks:
     - debug:
         msg: "Post-Software tasks Started"
@@ -11,7 +10,7 @@
   hosts:
     - cicd*
   become: true
-  gather_facts: true
+  gather_facts: True
   tags:
     - install_ci_components
   pre_tasks:
@@ -27,10 +26,10 @@
         keystore_pass: "{{ jenkins_keystore_password }}"
 
   roles:
-    - role: geerlingguy.gogs
-    - role: host-gogs-server
-    - role: host-jenkins-server
-    - role: molecule
+    - { role: "geerlingguy.gogs" }
+    - { role: "host-gogs-server" }
+    - { role: "host-jenkins-server" }
+    - { role: "molecule" }
 
   tasks:
     - name: include docker_setup tasks

@@ -1,7 +1,7 @@
 ---
-become_override: false
+become_override: False
 ocp_username: opentlc-mgr
-silent: false
+silent: False
 
 ocp4_workload_project_request_template_project_limits:
   - type: Container
@@ -18,7 +18,6 @@ ocp4_workload_project_request_template_project_limits:
     max:
       cpu: 4
       memory: 12Gi
-_project_request_message: >-
-  To provision Projects you must request access in https://labs.opentlc.com or https://rhpds.redhat.com.
-_install_limit_range: true
-_install_network_policies: true
+_project_request_message: "To provision Projects you must request access in https://labs.opentlc.com or https://rhpds.redhat.com."
+_install_limit_range: True
+_install_network_policies: True

@@ -1,6 +1,5 @@
----
 # vim: set ft=ansible
-
+---
 # Implement your Workload deployment tasks here
 
 # TODO: change to variable-based versions
@@ -68,7 +67,7 @@
     name: service-mesh-elastic
     namespace: service-mesh-operators
   register: operator_subscription_out
-  until:
+  until: 
     - operator_subscription_out is defined
     - operator_subscription_out.resources is defined
     - operator_subscription_out.resources[0] is defined
@@ -112,7 +111,7 @@
     name: service-mesh-jaeger
     namespace: service-mesh-operators
   register: operator_subscription_out
-  until:
+  until: 
     - operator_subscription_out is defined
     - operator_subscription_out.resources is defined
     - operator_subscription_out.resources[0] is defined
@@ -156,7 +155,7 @@
     name: service-mesh-kiali
     namespace: service-mesh-operators
   register: operator_subscription_out
-  until:
+  until: 
     - operator_subscription_out is defined
     - operator_subscription_out.resources is defined
     - operator_subscription_out.resources[0] is defined
@@ -200,7 +199,7 @@
     name: service-mesh-operator
     namespace: service-mesh-operators
   register: operator_subscription_out
-  until:
+  until: 
     - operator_subscription_out is defined
     - operator_subscription_out.resources is defined
     - operator_subscription_out.resources[0] is defined
@@ -256,4 +255,5 @@
 - name: workload tasks complete
   debug:
     msg: "Workload Tasks completed successfully."
-  when: not silent | bool
+  when: not silent|bool
+

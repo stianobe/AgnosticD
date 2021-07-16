@@ -37,7 +37,6 @@
     findme:
       - configs/{{ env_type }}/infra.yml
       - cloud_providers/{{ cloud_provider }}_infrastructure_deployment.yml
-      - cloud_providers/none_infrastructure_deployment.yml
   import_playbook: "{{ lookup('first_found', findme) }}"
   tags:
     - step001
@@ -97,7 +96,5 @@
     - step005
     - post_software
     - post_software_tasks
-
-- import_playbook: save_output_dir.yml
 
 - import_playbook: completion_callback.yml

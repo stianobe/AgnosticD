@@ -1,11 +1,10 @@
----
 labguide_project_name: labguide
 #labguide_project_display_name: CamelK Lab Guide
 
 console_url: https://console-openshift-console.{{subdomain_base}}
 api_url: https://api.{{subdomain_base}}:6443
 
-#
+# 
 
 _deployed_guide_name: camelk-lab
 _deployed_guide_string_url: https://gitlab.com/BrunoNetId/lab-camelk/raw/master/docs
@@ -16,7 +15,7 @@ base_domain: "{{subdomain_base}}"
 lab_name: camelk-lab
 
 # content_sources_project_name: content-sources
-# content_sources_project_display_name: Content Sources for CamelK Lab
+# content_sources_project_display_name: Content Sources for CamelK Lab 
 
 become_override: false
 
@@ -26,7 +25,7 @@ ocp_user_groups:
   - OPENTLC-PROJECT-PROVISIONERS
 
 
-silent: false
+silent: False
 
 # ocp_username: opentlc-mgr
 # admin_username: {{ocp_username}}
@@ -58,3 +57,5 @@ silent: false
 
 # deploy_status_retries: 15
 # deploy_status_delay: 20
+
+

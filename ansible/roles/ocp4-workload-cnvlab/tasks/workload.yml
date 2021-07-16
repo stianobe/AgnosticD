@@ -24,9 +24,7 @@
 - name: Deploy Workbook Instance for CNV Labs
   block:
   - name: Configure and apply build template
-    shell: >-
-      oc -n workbook process
-      -f ~/openshift-virt-labs/docs/build-template.yaml -p NAME=cnv | oc -n workbook apply -f -
+    shell: oc -n workbook process -f ~/openshift-virt-labs/docs/build-template.yaml -p NAME=cnv | oc -n workbook apply -f -
     register: buildt_success
     retries: 3
     delay: 30
@@ -40,10 +38,7 @@
     until: build_success is not failed
 
   - name: Configure and deploy the deploy template
-    shell: >-
-      oc -n workbook process
-      -f ~/openshift-virt-labs/docs/deploy-template.yaml -p NAME=cnv -p IMAGE_STREAM_NAME=cnv
-      | oc -n workbook apply -f -
+    shell: oc -n workbook process -f ~/openshift-virt-labs/docs/deploy-template.yaml -p NAME=cnv -p IMAGE_STREAM_NAME=cnv | oc -n workbook apply -f -
     register: deploy_success
     retries: 3
     delay: 30
@@ -64,4 +59,4 @@
 - name: workload tasks complete
   debug:
     msg: "Workload Tasks completed successfully."
-  when: not silent | bool
+  when: not silent|bool

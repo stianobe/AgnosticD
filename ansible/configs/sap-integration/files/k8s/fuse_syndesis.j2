@@ -1,47 +1,33 @@
-apiVersion: syndesis.io/v1beta2
+apiVersion: syndesis.io/v1beta1
 kind: Syndesis
 metadata:
-  annotations:
-    syndesis.io/applicationUrl: 'https://syndesis-fuse-online.apps.cluster-{{ guid }}.{{ ocp4_base_domain }}'
   name: sap
   namespace: fuse-online
 spec:
   addons:
-    jaeger:
-      enabled: true
+    camelk: {}
+    dv:
+      resources: {}
+    jaeger: {}
     knative: {}
-    ops: {}
+    ops:
+      enabled: true
     publicApi: {}
     todo: {}
   backup: {}
   components:
     database:
-      resources:
-        limit: {}
-        request: {}
+      resources: {}
     grafana:
-      resources:
-        limit: {}
-        request: {}
+      resources: {}
     meta:
-      resources:
-        limit: {}
-        request: {}
+      resources: {}
     oauth: {}
     prometheus:
-      resources:
-        limit: {}
-        request: {}
+      resources: {}
     server:
-      connectionPool: {}
-      features:
-        maven:
-          append: false
-      resources:
-        limit: {}
-        request: {}
+      features: {}
+      resources: {}
     upgrade:
       resources: {}
   forceMigration: false
-  infraScheduling: {}
-  integrationScheduling: {}

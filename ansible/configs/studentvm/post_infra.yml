@@ -1,4 +1,3 @@
----
 - name: Step 002 Post Infrastructure
   hosts: localhost
   connection: local
@@ -20,6 +19,6 @@
           guid: "{{guid}}"
           ipa_host_password: "{{ipa_host_password}}"
       body_format: json
-      validate_certs: false
+      validate_certs: False
       HEADER_Content-Type: "application/json"
       status_code: 200, 201

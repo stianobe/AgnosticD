@@ -2,7 +2,7 @@
 - name: Make temp directory for files
   command: mktemp -d /tmp/ansible-XXXXXX
   register: mktemp
-  changed_when: false
+  changed_when: False
 
 - name: Copy files to temp directory
   copy:

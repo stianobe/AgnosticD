@@ -1,4 +1,3 @@
----
 - name: Step 002 Post Infrastructure
   hosts: localhost
   gather_facts: false
@@ -16,7 +15,7 @@
         aws_public_subnet_cidr: "{{ _region.subnet_cidr }}"
         aws_dns_zone_private: "{{ _region.name }}.{{ guid }}.internal."
         aws_dns_zone_public_prefix: "{{ _region.name }}."
-        secondary_stack: true
+        secondary_stack: yes
       loop_control:
         loop_var: _region
       include_tasks: deploy_stack.yml

@@ -1,7 +1,7 @@
 ---
 - hosts: all
   name: Install the web server and start it
-  become: true
+  become: yes
   vars:
     httpd_packages:
       - httpd
@@ -32,11 +32,12 @@
       service:
         name: httpd
         state: started
-        enabled: true
+        enabled: yes
 
   handlers:
     - name: restart apache service
       service:
         name: httpd
         state: restarted
-        enabled: true
+        enabled: yes
+

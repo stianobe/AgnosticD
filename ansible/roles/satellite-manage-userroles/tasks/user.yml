@@ -1,6 +1,5 @@
----
 - name: Create a user
-  theforeman.foreman.user:
+  theforeman.foreman.foreman_user:
     name: "{{ user.name }}"
     firstname: "{{ user.firstname | d('John') }}"
     lastname: "{{ user.lastname | d('Doe') }}"
@@ -21,6 +20,6 @@
     username: "{{ satellite_admin }}"
     password: "{{ satellite_admin_password }}"
     server_url: "https://{{ publicname }}"
-    validate_certs: false
+    validate_certs: no
     state: present
   with_items: "{{ satellite_users }}"

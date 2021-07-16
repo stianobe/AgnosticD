@@ -1,4 +1,3 @@
----
 - name: Create /tmp/{{guid}}/ directory to download course data on control node
   file:
     path: /tmp/{{guid}}/
@@ -8,6 +7,7 @@
   unarchive:
     src: "{{courseurl}}/{{coursecode}}.tar.gz"
     dest: /tmp/{{guid}}/
-    remote_src: true
+    remote_src: yes 
   tags:
     - handle-course-data
+

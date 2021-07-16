@@ -6,11 +6,11 @@
   tags:
     - configure_satellite_firewalld
     - install_satellite
-
+ 
 - name: firewall | Enable and Start Firewalld
   service:
     name: firewalld
-    enabled: true
+    enabled: yes
     state: started
   tags:
     - configure_satellite_firewalld
@@ -19,8 +19,8 @@
 - name: firewall | Enable ports in firewall
   firewalld:
     port: "{{ item }}"
-    permanent: true
-    immediate: true
+    permanent: yes
+    immediate: yes
     state: enabled
   with_items:
     - "{{ firewall_ports }}"

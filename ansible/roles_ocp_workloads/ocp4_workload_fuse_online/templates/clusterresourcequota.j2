@@ -1,7 +1,7 @@
 apiVersion: quota.openshift.io/v1
 kind: ClusterResourceQuota
 metadata:
-  name: clusterquota-{{ clusterresourcequota_name }}
+  name: clusterquota-{{ ocp_username }}-{{ guid }}
   labels:
     workload: ocp-workload-fuse-ignite
 spec:

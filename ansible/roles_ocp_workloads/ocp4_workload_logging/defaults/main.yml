@@ -1,7 +1,7 @@
 ---
-become_override: false
+become_override: False
 ocp_username: opentlc-mgr
-silent: false
+silent: False
 
 # Set up Cluster Logging on regular worker nodes
 # The Node Role for nodes to deploy cluster logging onto. Empty means default worker nodes

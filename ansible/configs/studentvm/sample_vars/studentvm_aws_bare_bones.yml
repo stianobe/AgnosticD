@@ -1,4 +1,3 @@
----
 # -------------------------------------------------------------------
 # StudentVM on AWS. Bare bones, only `cloud-user` will have
 # access to the VM.

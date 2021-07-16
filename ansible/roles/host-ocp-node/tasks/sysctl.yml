@@ -3,5 +3,5 @@
   sysctl:
     name: vm.max_map_count
     value: 262144
-    reload: true
-    sysctl_set: true
+    reload: yes
+    sysctl_set: yes

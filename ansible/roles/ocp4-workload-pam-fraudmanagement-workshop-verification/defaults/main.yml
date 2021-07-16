@@ -1,7 +1,7 @@
 ---
-become_override: false
+become_override: False
 ocp_username: system:admin
-silent: false
+silent: False
 
 tmp_dir: /tmp/ocp4-workload-pam-fraudmanagement-workshop
 

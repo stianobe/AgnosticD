@@ -1,4 +1,3 @@
----
 - name: Step 003 Pre Software
   hosts: localhost
   gather_facts: false
@@ -7,38 +6,35 @@
     - debug:
         msg: "Step 003 Pre Software"
 
-    - include_role:
+    - import_role:
         name: infra-local-create-ssh_key
       when: set_env_authorized_key | bool
+
 
 - name: Configure all hosts with Repositories, Common Files and Set environment key
   hosts:
     - all:!windows
   become: true
-  gather_facts: false
+  gather_facts: False
   tags:
     - common_tasks
-  tasks:
-    - include_role:
-        name: set-repositories
+  roles:
+    - role: set-repositories
       when: repo_method is defined
 
-    - include_role:
-        name: common
+    - role: common
       when: install_common | bool
 
-    - include_role:
-        name: set_env_authorized_key
+    - role: set_env_authorized_key
       when: set_env_authorized_key | bool
 
 - name: Configuring Bastion Hosts
   hosts: bastions
   become: true
-  gather_facts: false
-  tasks:
-    - include_role:
-        name: bastion-lite
-      when: install_bastion | bool
+  gather_facts: False
+  roles:
+    -  role: bastion
+       when: install_bastion | bool
   tags:
     - bastion_tasks
 

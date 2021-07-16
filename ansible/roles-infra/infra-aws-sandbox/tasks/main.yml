@@ -18,7 +18,7 @@
 - import_tasks: user.yml
 - import_tasks: route53.yml
 - include_tasks: keypair.yml
-  when: operation in ['CREATE', 'RESET']
+  when: operation == 'CREATE'
   tags: keypair
 - include_tasks: ipa.yml
   when:

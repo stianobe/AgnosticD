@@ -34,6 +34,9 @@ tower_version: 3.5.0-1                 # tower version you want to install
 software_to_deploy: tower              # Define tower to install tower or none to have only infra ready.
 
 
+
+
+
 #### Worker Node for Isolated Node group
 # worker_instance_type: "t2.medium"
 worker_instance_count: 0              # Set 0 to not to provision worker(isolated) nodes.
@@ -61,6 +64,7 @@ default_workloads:
 #  - tower-babylon-job-runner
 
 
+
 ### tower project roles
 tower_projects:
   - name: darktower-dev
@@ -69,7 +73,7 @@ tower_projects:
     scm_url: "https://github.com/redhat-gpte-devopsautomation/dark-tower.git"
     #scm_type:
     #scm_credential:
-    scm_branch: dev
+    scm_branch:  dev
     scm_update_on_launch: true
 
 tower_inventories:
@@ -79,8 +83,10 @@ tower_inventories:
     # instance_group: ""
 
 
-# tower_license: >
-# Set the tower licencse in the same format. Do not forget to add "eula_accepted: true".
+
+
+
+# tower_license: >                     #Set the tower licencse in the same format. Do not forget to add "eula_accepted: true".
 #   {
 #     "eula_accepted": true,
 #     "company_name": "Red Hat",
@@ -96,14 +102,13 @@ tower_inventories:
 #     "trial": true
 #   }
 
-#Define users you want to create. Set superuser: yes to make user system wide System Administrator
-tower_user_accounts:
+tower_user_accounts:                                      #Define users you want to create. Set superuser: yes to make user system wide System Administrator
   - user: babylon
     password: changeme
     email: babylon@example.com
     firstname: Baby
     lastname: Lon
-    superuser: true
+    superuser: yes
   - user: babylon-viewer
     password: changeme
     email: babylon1@example.com
@@ -135,7 +140,7 @@ tower_job_templates:
     #vault_credential:
     project: darktower-dev
     playbook: job-runner.yml
-    become: true
+    become: yes
     inventory: empty-inventory-default
 
 # Tower settings
@@ -162,5 +167,5 @@ pip_requirements:
 
 
 key_local_path:
-  - "~/.ssh/{{key_name}}.pem"
-  - "~/.ssh/opentlc_admin_backdoor.pem"
+    - "~/.ssh/{{key_name}}.pem"
+    - "~/.ssh/opentlc_admin_backdoor.pem"

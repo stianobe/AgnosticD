@@ -35,8 +35,6 @@ resources:
       allocation_pools:
         - start: {{ network['allocation_start'] }}
           end: {{ network['allocation_end'] }}
-    depends_on:
-      - {{ network['name'] }}-network
 
 {% if network['create_router'] %}
   {{ network['name'] }}-router:
@@ -120,11 +118,6 @@ resources:
     {% endif %}
     depends_on:
       - {{ instance['network'] | default('default') }}-router_private_interface
-    {% if instance.security_groups is defined %}
-      {% for security_group in instance.security_groups %}
-      - {{ security_group }}
-      {% endfor %}
-    {% endif %}
 
 
     {% if instance.floating_ip | default(false) or instance.public_dns | default(false) %}
@@ -132,13 +125,6 @@ resources:
     type: OS::Neutron::FloatingIP
     properties:
       floating_network: {{ provider_network }}
-      floating_subnet:
-        get_attr:
-          - {{ instance['network'] | default('default') }}-router
-          - external_gateway_info
-          - external_fixed_ips
-          - 0
-          - subnet_id
     depends_on:
       - {{ instance['network'] | default('default') }}-router_private_interface
 
@@ -196,7 +182,6 @@ resources:
       - {{ security_group }}
       {% endfor %}
     {% endif %}
-      - port_{{ iname }}
 
     {% if instance.volumes is defined %}
   #### Volumes for {{ iname }} ####

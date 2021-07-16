@@ -15,17 +15,17 @@
     state: present
 
 - name: Mark Gnome initial setup as done
-  become: true
+  become: yes
   become_user: "{{ student_name }}"
   lineinfile:
     dest: /home/{{ student_name }}/.config/gnome-initial-setup-done
     state: present
     regexp: '^yes$'
     line: 'yes'
-    create: true
+    create: yes
 
 - name: Disable Gnome screen locking
-  become: true
+  become: yes
   become_user: "{{ student_name }}"
   dconf:
     key: "/org/gnome/desktop/screensaver/lock-enabled"
@@ -33,7 +33,7 @@
     state: present
 
 - name: Disable Gnome screensaver
-  become: true
+  become: yes
   become_user: "{{ student_name }}"
   dconf:
     key: "/org/gnome/desktop/session/idle-delay"
@@ -41,36 +41,34 @@
     state: present
 
 - name: Set up Gnome favorites
-  become: true
+  become: yes
   blockinfile:
-    create: true
+    create: yes
     path: /etc/dconf/db/local.d/00-favorite-apps
-    # yamllint disable rule:line-length
     block: |
       [org/gnome/shell]
       favorite-apps = ['firefox.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Terminal.desktop', 'scap-workbench.desktop']
-    # yamllint enable rule:line-length
 
 - name: Set up Gnome favorites 2
-  become: true
+  become: yes
   lineinfile:
-    create: true
+    create: yes
     path: /etc/dconf/db/local.d/locks/favorite-apps
     line: /org/gnome/shell/favorite-apps
     state: present
 
 - name: Dconf update
-  become: true
+  become: yes
   command: dconf update
 
 - name: Permanently Disable Gnome Getting Started Window during Welcome Tour
-  become: true
+  become: yes
   replace:
     path: /usr/libexec/gnome-welcome-tour
     regexp: "yelp help:gnome-help/getting-started"
     replace: "#yelp help:gnome-help/getting-started"
 
 - name: Kill any yelp window that might have been opened during login session
-  become: true
+  become: yes
   ignore_errors: true
   shell: "killall yelp"

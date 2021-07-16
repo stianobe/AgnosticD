@@ -1,8 +1,8 @@
 ---
 roles:
-- src: https://github.com/redhat-gpte-devopsautomation/satellite-installation.git
+- src: miteshget.satellite_installation
   name: satellite-installation
-  version: '1.0.0'
+  version: '1.0.1'
 
 collections:
 - name: theforeman.foreman

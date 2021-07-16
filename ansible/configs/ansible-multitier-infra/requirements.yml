@@ -1,4 +1,5 @@
 ---
-collections:
-  - name: awx.awx
-    version: '15.0.0'
+# External role to setup grader host virtualenv and FTL grading infra
+
+- src: https://github.com/redhat-gpte-devopsautomation/ftl-injector
+  name: ftl-injector

@@ -7,22 +7,22 @@ metadata:
 spec:
   tags:
   - annotations:
-      description: Quarkus stack for Java and CodeReady Workspaces on OCP 4.6
+      description: Quarkus stack for Java and CodeReady Workspaces
       iconClass: icon-java
       supports: java
       tags: builder,java
-      version: "2.5"
+      version: "2.1"
     from:
       kind: DockerImage
-      name: quay.io/openshiftlabs/quarkus-workshop-stack:2.5
-    name: "2.5"
+      name: quay.io/openshiftlabs/quarkus-workshop-stack:2.1
+    name: "2.1"
   - annotations:
-      description: Quarkus stack for Java and CodeReady Workspaces on OCP 4.7
+      description: Quarkus stack for Java and CodeReady Workspaces
       iconClass: icon-java
       supports: java
       tags: builder,java
-      version: "2.7"
+      version: "2.2"
     from:
       kind: DockerImage
-      name: quay.io/openshiftlabs/quarkus-workshop-stack:2.7
-    name: "2.7"
+      name: quay.io/openshiftlabs/quarkus-workshop-stack:2.2
+    name: "2.2"

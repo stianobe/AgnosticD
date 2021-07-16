@@ -1,4 +1,3 @@
----
 - name: Add the user 'auditlab'
   user:
     name: auditlab
@@ -9,16 +8,16 @@
     state: directory
     owner: auditlab
     group: auditlab
-    mode: u=rwx,go=
+    mode: '0700'
 
 - name: Use root's authorized_key for auditlab user
   copy:
     src: /root/.ssh/authorized_keys
     dest: /home/auditlab/.ssh/authorized_keys
-    remote_src: true
+    remote_src: yes
     owner: auditlab
     group: auditlab
-    mode: u=rw,go=
+    mode: '0600'
 
 - name: install Audit lab packages
   package:

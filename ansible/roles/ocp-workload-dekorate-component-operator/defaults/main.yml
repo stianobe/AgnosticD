@@ -1,6 +1,6 @@
 ---
-become_override: false
-silent: false
+become_override: False
+silent: False
 kube_config: $HOME/.kube/config
 
 # Helm vars

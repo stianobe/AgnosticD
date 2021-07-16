@@ -16,7 +16,7 @@ spec:
           resources:
             requests:
               storage: 64Gi
-          storageClassName: {{ cloud_storageclass_name }}
+          storageClassName: standard
           volumeMode: Block
         status: {}
       name: ocs-deviceset

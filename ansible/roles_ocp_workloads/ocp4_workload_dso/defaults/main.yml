@@ -1,7 +1,7 @@
 ---
-become_override: false
+become_override: no
 ocp_username: opentlc-mgr
-silent: false
+silent: False
 
 ###### OpenShift defaults
 
@@ -23,7 +23,7 @@ ocp4_dso_openshift_cli: oc
 ###### User defaults
 
 # Default user count for projects and namespaces
-ocp4_dso_user_count_start: 1
+ocp4_dso_user_count_start: 0
 
 # Default user count for projects and namespaces#
 ocp4_dso_user_count: 3
@@ -50,7 +50,10 @@ ocp4_dso_reponame_local: SecurityDemos
 ocp4_dso_reponame: SecurityDemos
 
 # Path of spring boot application build by pipeline
-ocp4_dso_demoapp_location: 2021Labs/OpenShiftSecurity/spring-boot-angular-ecommerce
+ocp4_dso_demoapp_location: 2020Labs/OpenShiftSecurity/spring-boot-angular-ecommerce
+
+# Used by docker daemon on bastion for looking up quay images that are pushed by pipeline
+ocp4_dso_ocp_registry_route: unset
 
 # Used for deployment of gogs, sonarqube, and nexus with persistent storage
 ocp4_dso_ephemeral: false

@@ -4,10 +4,11 @@ extends: default
 rules:
   comments:
     require-starting-space: false
-    min-spaces-from-content: 1
   comments-indentation: disable
   indentation:
+    level: warning
     indent-sequences: consistent
   line-length:
-    max: 120
+    level: warning
+    max: 125
     allow-non-breakable-inline-mappings: true

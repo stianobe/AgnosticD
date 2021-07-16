@@ -4,28 +4,28 @@
     yum:
       state: present
       name:
-      - mariadb-server
-      - firewalld
+        - mariadb-server
+        - firewalld
 
   - name: Ensure firewalld is running
     service:
       name: firewalld
       state: started
-      enabled: true
+      enabled: yes
 
   - name: Open Firewall for MySQL use
     firewalld:
       service: "{{ item }}"
-      permanent: true
+      permanent: yes
       state: enabled
-      immediate: true
+      immediate: yes
     with_items:
     - mysql
 
   - name: Ensure MySQL is running at boot
     service:
       name: mariadb
-      enabled: true
+      enabled: yes
       state: started
 
   - name: Setup up SQL commands

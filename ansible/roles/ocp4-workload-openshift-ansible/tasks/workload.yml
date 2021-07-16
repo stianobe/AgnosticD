@@ -10,46 +10,46 @@
     - mysqlrestore_crd.yml.j2
 
 - name: Install Docker
-  become: true
+  become: yes
   package:
     name:
       - docker
     use: yum
-
+  
 - name: Enable and Start Docker
-  become: true
+  become: yes
   service:
     name: docker
     enabled: true
     state: started
 
 - name: Create docker group
-  become: true
+  become: yes
   group:
     name: docker
     state: present
 
 - name: Create users group
-  become: true
+  become: yes
   group:
     name: users
     state: present
 
 - name: Add user to docker and users groups
-  become: true
+  become: yes
   user:
     name: "{{ student_name }}"
-    append: true
+    append: yes
     groups: docker,users
 
 - name: Restart docker
-  become: true
+  become: yes
   service:
     name: docker
     state: restarted
 
 - name: Download operator-sdk
-  become: true
+  become: yes
   get_url:
     url: "https://github.com/operator-framework/operator-sdk/releases/download/v0.5.0/operator-sdk-v0.5.0-x86_64-linux-gnu"
     dest: "/usr/local/bin/operator-sdk"

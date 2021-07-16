@@ -42,15 +42,10 @@
           content: "{{ tower_cli_config }}"
           dest: /etc/tower/tower_cli.cfg
 
-      - name: Dump Ansible Tower Workflow Schema HA to a file
+      - name: Dump Ansible Tower Workflow Schema to a file
         copy:
-          content: "{{ workflow_schema_ha }}"
-          dest: /tmp/schema_ha.yml
-
-      - name: Dump Ansible Tower Workflow Schema non-HA to a file
-        copy:
-          content: "{{ workflow_schema_non_ha }}"
-          dest: /tmp/schema_non_ha.yml
+          content: "{{ workflow_schema }}"
+          dest: /tmp/schema.yml
 
       - name: Ensure Tower License is configured
         include_role:
@@ -73,16 +68,10 @@
           name: infra-ansible/roles/ansible/tower/manage-job-templates
 
       - name: Ensure required WorkFlow Templates are added to Tower
-        shell: "{{ item }}"
-        loop:
-          - /usr/local/bin/tower-cli workflow create --name="SAP HANA and S/4HANA E2E deployment"
-          - /usr/local/bin/tower-cli workflow create --name="SAP HANA and S/4HANA E2E deployment - HA Mode"
+        shell: /usr/local/bin/tower-cli workflow create --name="SAP HANA and S/4HANA E2E deployment"
 
-      - name: Populate new WorkFlows with specified schemas
-        shell: "{{ item }}"
-        loop:
-          - /usr/local/bin/tower-cli workflow schema "SAP HANA and S/4HANA E2E deployment" @/tmp/schema_non_ha.yml
-          - /usr/local/bin/tower-cli workflow schema "SAP HANA and S/4HANA E2E deployment - HA Mode" @/tmp/schema_ha.yml
+      - name: Populate new WorkFlow with specified schema
+        shell: /usr/local/bin/tower-cli workflow schema "SAP HANA and S/4HANA E2E deployment" @/tmp/schema.yml
 
       when: tower_instance_count > 0
 

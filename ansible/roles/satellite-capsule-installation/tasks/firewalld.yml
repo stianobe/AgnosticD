@@ -6,20 +6,20 @@
     state: present
   tags:
     - configure_capsule_firewalld
-
+ 
 - name: firewall | Enable and Start Firewalld
   service:
     name: firewalld
-    enabled: true
+    enabled: yes
     state: started
   tags:
     - configure_capsule_firewalld
 
-- name: firewall | Enable firewall ports
+- name: firewall | Enable firewall ports 
   firewalld:
     port: "{{ item }}"
-    permanent: true
-    immediate: true
+    permanent: yes
+    immediate: yes
     state: enabled
   with_items:
     - "{{ firewall_capsule_ports }}"
@@ -29,9 +29,9 @@
 - name: firewall | Enable firewall rule service
   firewalld:
     service: "{{ item }}"
-    permanent: true
+    permanent: yes
     state: enabled
-    immediate: true
+    immediate: yes
   with_items:
     - "{{ firewall_capsule_services }}"
   tags:

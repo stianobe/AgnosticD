@@ -1,7 +1,7 @@
 ---
-become_override: false
+become_override: False
 ocp_username: wkulhane-redhat.com
-silent: false
+silent: False
 
 # All OpenShift groups to add the user {{ ocp_username }} to
 # Leave empty ( {} )to not add the user to any groups
@@ -52,3 +52,4 @@ ocp4_workload_quarkus_experienced_elt_quota:
     services: "20"
     persistentvolumeclaims: "2"
     requests.storage: 10Gi
+ 

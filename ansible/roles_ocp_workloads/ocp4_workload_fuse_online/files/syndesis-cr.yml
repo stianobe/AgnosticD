@@ -1,4 +1,3 @@
----
 apiVersion: syndesis.io/v1beta1
 kind: Syndesis
 metadata:

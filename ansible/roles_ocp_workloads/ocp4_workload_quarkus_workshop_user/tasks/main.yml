@@ -7,7 +7,7 @@
     file: ./pre_workload.yml
     apply:
       become: "{{ become_override | bool }}"
-  when: ACTION in ("create", "provision", "remove", "destroy")
+  when: ACTION == "create" or ACTION == "provision" or ACTION == "remove"
 
 - name: Running Workload Tasks
   include_tasks:

@@ -8,7 +8,7 @@
           - openscap-scanner
           - scap-workbench
         state: present
-      check_mode: true
+      check_mode: yes
       register: packages_installed
 
 - name: Check whether lab packages are installed

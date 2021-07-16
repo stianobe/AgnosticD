@@ -1,7 +1,7 @@
 ---
-become_override: false
+become_override: False
 ocp_username: opentlc-mgr
-silent: false
+silent: False
 
 # Remove self-provisioner cluster role from system:authenticated and system:authenticated:oauth groups
 ocp4_workload_opentlc_production_remove_self_provisioner: true

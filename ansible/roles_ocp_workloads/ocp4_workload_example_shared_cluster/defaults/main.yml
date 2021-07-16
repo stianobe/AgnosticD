@@ -1,7 +1,7 @@
 ---
-become_override: false
+become_override: False
 ocp_username: wkulhane-redhat.com
-silent: false
+silent: False
 
 # If your workload needs customization options provide variables to be used.
 # Variable names must be prefixed by the role name "<role name>_<variable>".

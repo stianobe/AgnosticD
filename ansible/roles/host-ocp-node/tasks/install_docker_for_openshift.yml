@@ -1,6 +1,5 @@
----
 # vim: set ft=ansible:
-
+---
 - name: Install docker
   yum:
     name: "docker-{{ docker_version }}"
@@ -18,4 +17,4 @@
   service:
     name: docker
     state: started
-    enabled: true
+    enabled: yes

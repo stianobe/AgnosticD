@@ -1,8 +1,8 @@
 ---
 galaxy_info:
   role_name: ocp4-workload-jdg-workshop
-  author:
-    - Application Service BU Runtimes Team, Syed M. Shaaf (sshaaf@redhat.com)
+  author: 
+    - Application Service BU Runtimes Team, S.M. Shaaf (sshaaf@redhat.com)
     - Application Service BU Runtimes Team, Daniel Oh (doh@redhat.com)
   description: |
     Create Red Hat DataGrid hands-on workshop with DataGrid Operator, CodeReady Workspaces, OpenShift 4.
@@ -11,9 +11,8 @@ galaxy_info:
   min_ansible_version: 2.9
   platforms: []
   galaxy_tags:
-    - datagrid
-    - jdg
-    - rhdg
-    - workshop
-    - openshift
+  - datagrid
+  - jdg
+  - workshop
+  - openshift
 dependencies: []

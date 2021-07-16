@@ -1,6 +1,6 @@
 ---
 - name: Install AMQ packages
-  become: true
+  become: yes
   block:
   - name: Install qpid packages
     package:

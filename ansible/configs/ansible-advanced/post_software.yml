@@ -1,8 +1,7 @@
----
 - name: Step 00xxxxx post software
   hosts: localhost
-  gather_facts: false
-  become: true
+  gather_facts: False
+  become: yes
   tasks:
     - debug:
         msg: "Post-Software tasks Started"

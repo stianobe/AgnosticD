@@ -4,22 +4,9 @@
 - name: Delete Infrastructure
   hosts: localhost
   connection: local
-  gather_facts: false
-  become: false
+  gather_facts: False
+  become: no
   tasks:
-    - name: Run infra-aws-capacity-reservation
-      include_role:
-        name: infra-aws-capacity-reservation
-      vars:
-        ACTION: destroy
-
-    - name: Run infra-aws-open-environment Role
-      include_role:
-        name: infra-aws-open-environment
-      vars:
-        ACTION: destroy
-      when: agnosticd_open_environment | default(false) | bool
-
     - name: Run infra-ec2-template-destroy
       include_role:
         name: infra-ec2-template-destroy

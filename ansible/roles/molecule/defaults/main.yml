@@ -1,4 +1,3 @@
----
 molecule_yum_packages:
   - gcc
   - python-pip

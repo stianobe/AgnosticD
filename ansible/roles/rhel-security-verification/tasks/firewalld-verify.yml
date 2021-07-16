@@ -3,7 +3,7 @@
   package:
     name: firewalld
     state: absent
-  check_mode: true
+  check_mode: yes
   register: firewalld_not_installed
 
 - name: Check whether firewalld is not installed
@@ -19,7 +19,7 @@
   file:
     path: /usr/lib/firewalld/services/dns.xml
     state: file
-  check_mode: true
+  check_mode: yes
   register: dns_service
 
 - name: Check whether /usr/lib/firewalld/services/dns.xml exists

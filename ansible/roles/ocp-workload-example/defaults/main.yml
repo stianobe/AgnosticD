@@ -1,7 +1,7 @@
 ---
-become_override: false
+become_override: False
 ocp_username: wkulhane-redhat.com
-silent: false
+silent: False
 
 # If your workload needs customization options provide variables
 # in a dictionary. The dictionary should be named "<role name>_defaults".

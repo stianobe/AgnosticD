@@ -5,8 +5,6 @@
   k8s:
     state: present
     definition: "{{ lookup('template', role_path ~ '/templates/clusterresourcequota.j2' ) | from_yaml }}"
-  vars:
-    clusterresourcequota_name: "{{ (ocp_username + '-' + guid) | replace('_','-') }}"
 
 # Leave this as the last task in the playbook.
 # For deployment onto a dedicated cluster (as part of the
@@ -16,8 +14,8 @@
   debug:
     msg: "Pre-Workload tasks completed successfully."
   when:
-  - not silent | bool
-  - not workload_shared_deployment | default(true) |  bool
+  - not silent|bool
+  - not workload_shared_deployment|d(True)
 
 # For RHPDS deployment (onto a shared cluster) set
 # workload_shared_deployment to True
@@ -26,5 +24,5 @@
   debug:
     msg: "Pre-Software checks completed successfully"
   when:
-  - not silent | bool
-  - workload_shared_deployment | default(true) | bool
+  - not silent|bool
+  - workload_shared_deployment|d(True)
