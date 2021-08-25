@@ -11,7 +11,7 @@
 
     - name: Get all security groups
       register: r_all_sg
-      ec2_group_facts:
+      ec2_group_info:
 
     - when: r_all_sg.security_groups | length > 0
       block:
@@ -32,7 +32,7 @@
     # Instance
 
     - name: Get all instances
-      ec2_instance_facts:
+      ec2_instance_info:
       register: r_all_instances
 
     - when: r_all_instances.instances | length > 0
@@ -53,9 +53,34 @@
 
         - set_fact:
             run_aws_nuke_again: true
+
+    # RDS DB Instances
+
+    - name: Get all RDS DB instances
+      command: >-
+        aws --profile {{ account_profile | quote }}
+        --region {{ _region | quote }}
+        rds describe-db-instances
+        --output json
+        --query 'DBInstances[*].DBInstanceIdentifier'
+      register: r_all_db_instances
+
+    - name: Save list as fact
+      set_fact:
+        db_instances: "{{ r_all_db_instances.stdout | from_json | list }}"
+
+    - name: Disable termination protection on all DBInstances
+      loop: "{{ db_instances }}"
+      command: >-
+        aws --profile {{ account_profile | quote }}
+        --region {{ _region | quote }}
+        rds modify-db-instance
+        --db-instance-identifier {{ item }}
+        --no-deletion-protection
+
     # EIP
 
-    - ec2_eip_facts:
+    - ec2_eip_info:
       register: r_all_eips
 
     - when: r_all_eips.addresses | length > 0

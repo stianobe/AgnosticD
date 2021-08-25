@@ -14,7 +14,7 @@
         account_hosted_zone_id: "{{ _route53zone.zone_id }}"
 
     - name: Grab facts about the zone
-      route53_facts:
+      route53_info:
         query: hosted_zone
         hosted_zone_method: details
         hosted_zone_id: "{{ _route53zone.zone_id }}"
