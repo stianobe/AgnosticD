@@ -1,0 +1,230 @@
+---
+###### VARIABLES YOU SHOULD CONFIGURE FOR YOUR DEPLOYEMNT
+###### OR PASS as "-e" args to ansible-playbook command
+cloud_provider: ec2
+platform: labs
+software_to_deploy: none
+
+### Common Host settings
+# Repo Method. One of file, satellite and rhn
+repo_method: satellite
+
+#If using repo_method: satellite, you must set these values as well.
+# satellite_url: satellite.example.com
+# satellite_org: Sat_org_name
+# satellite_activationkey: "rhel7basic"
+
+# Do you want to run a full yum update
+update_packages: true
+
+## guid is the deployment unique identifier, it will be appended to all tags,
+## files and anything that identifies this environment from another "just like it"
+#guid: defaultguid
+
+install_bastion: true
+install_common: true
+install_ftl: false
+#install_student_user: true
+#student_name: lab-user
+
+### If you want a Key Pair name created and injected into the hosts,
+# set `set_env_authorized_key` to true and set the keyname in `env_authorized_key`
+# you can use the key used to create the environment or use your own self generated key
+# if you set "use_own_key" to false your PRIVATE key will be copied to the bastion. (This is {{key_name}})
+
+use_own_key: true
+set_env_authorized_key: true
+env_authorized_key: "{{ guid }}key"
+ansible_ssh_private_key_file: ~/.ssh/{{ key_name }}.pem
+
+
+
+### AWS EC2 Environment settings
+
+### Route 53 Zone ID (AWS)
+# This is the Route53 HostedZoneId where you will create your Public DNS entries
+# This should come from the account
+HostedZoneId: Z3IHLWJZOU9SRT
+
+# The region to be used, if not specified by -e in the command line
+aws_region: us-east-2
+
+# The key that is used to
+key_name: "default_key_name"
+
+## Networking (AWS)
+subdomain_base_short: "{{ guid }}"
+subdomain_base_suffix: ".example.opentlc.com"
+subdomain_base: "{{ subdomain_base_short ~ subdomain_base_suffix }}"
+
+## VM Sizing
+
+bastion_instance_type: t3a.medium
+bastion_rootfs_size: 100
+bastion_instance_image: RHEL83GOLD
+
+
+###### VARIABLES YOU SHOULD ***NOT*** CONFIGURE FOR YOUR DEPLOYEMNT
+
+ansible_user: ec2-user
+remote_user: ec2-user
+
+common_packages_el8:
+- python3
+- unzip
+- bash-completion
+- tmux
+- bind-utils
+- wget
+- nano
+- git
+- vim-enhanced
+- httpd-tools
+- openldap-clients
+- podman
+- tree
+- ansible
+
+### CLOUDFORMATIONS vars
+
+project_tag: "{{ env_type }}-{{ guid }}"
+
+zone_internal_dns: "{{ guid }}.internal."
+chomped_zone_internal_dns: "{{ guid }}.internal"
+
+bastion_public_dns: "control.{{ subdomain_base }}."
+bastion_public_dns_chomped: "control.{{ subdomain_base }}"
+vpcid_name_tag: "{{ subdomain_base }}"
+
+# az_1_name: "{{ aws_region }}a"
+# az_2_name: "{{ aws_region }}b"
+
+instances:
+  - name: "{{ bastion_instance_name | default('control') }}"
+    count: 1
+    unique: true
+    public_dns: true
+    image: "{{ bastion_instance_image }}"
+    flavor:
+      ec2: "{{ bastion_instance_type }}"
+    tags:
+      - key: "AnsibleGroup"
+        value: "bastions,{{ bastion_group_name | default('controls') }}"
+      - key: "ostype"
+        value: "linux"
+      - key: "instance_filter"
+        value: "{{ env_type }}-{{ email }}"
+    rootfs_size: "{{ bastion_rootfs_size }}"
+    security_groups:
+      - BastionSG
+      - HostSG
+      - WebSG
+
+
+# Security Groups
+
+security_groups:
+  - name: BastionSG
+    rules:
+      - name: BasSSHPublic
+        description: "SSH public"
+        from_port: 22
+        to_port: 22
+        protocol: tcp
+        cidr: "0.0.0.0/0"
+        rule_type: Ingress
+
+  - name: WebSG
+    rules:
+      - name: WebSGHTTPPort
+        description: "Allow HTTP port"
+        from_port: 80
+        to_port: 80
+        protocol: tcp
+        cidr: "0.0.0.0/0"
+        rule_type: Ingress
+      - name: WebSGHTTPsPort
+        description: "Allow HTTPs port"
+        from_port: 443
+        to_port: 443
+        protocol: tcp
+        cidr: "0.0.0.0/0"
+        rule_type: Ingress
+      - name: WebSGhaHTTPPort
+        description: "Allow haHTTP port"
+        from_port: 8080
+        to_port: 8080
+        protocol: tcp
+        cidr: "0.0.0.0/0"
+        rule_type: Ingress
+      - name: WebSGhasHTTPPort
+        description: "Allow hasHTTP port"
+        from_port: 8443
+        to_port: 8443
+        protocol: tcp
+        cidr: "0.0.0.0/0"
+        rule_type: Ingress
+      - name: WebSGexHTTPPort
+        description: "Allow exHTTP port"
+        from_port: 8929
+        to_port: 8929
+        protocol: tcp
+        cidr: "0.0.0.0/0"
+        rule_type: Ingress
+
+  - name: HostSG
+    rules:
+      - name: HostSGTCP
+        description: "Allow everything from HostSG nodes"
+        from_port: 1
+        to_port: 65535
+        protocol: tcp
+        from_group: HostSG
+        rule_type: Ingress
+      - name: HostSGUDP
+        description: "Allow everything from HostSG nodes"
+        from_port: 1
+        to_port: 65535
+        protocol: udp
+        from_group: HostSG
+        rule_type: Ingress
+
+
+inventory_groups:
+  - bastions
+  - satellites
+
+# Environment Pods
+pods:
+  - name: bind9
+    dockerfile: true
+    volumes:
+      - /var/named/
+      - /etc/
+    config_templates:
+      - src: example.com.zone.j2
+        dest: /var/named/example.com.zone
+    config_files:
+      - src: named.conf
+        dest: /etc/named.conf
+
+  - name: gitlab
+    volumes:
+      - /etc/gitlab
+      - /var/log/gitlab
+      - /var/opt/gitlab
+
+  - name: haproxy
+    dockerfile: true
+    volumes:
+      - /etc/haproxy
+      - /etc/ssl/certs
+    config_templates:
+      - src: haproxy.cfg.j2
+        dest: /etc/haproxy/haproxy.cfg
+    letsencrypt_cert_dirs:
+      - /etc/ssl/certs/
+
+# Lab Manager Path
+lab_mgr_dir: /srv/lab-manager
+...
