@@ -69,20 +69,23 @@
         owner: root
         group: root
         mode: 0400
-    - name: create openstack directory
-      file:
-        path: "/etc/openstack"
-        state: directory
-        owner: root
-        group: root
-        mode: 0755
-    - name: copy clouds.yaml template
-      template:
-        src: "./files/clouds.yaml.j2"
-        dest: /etc/openstack/clouds.yaml
-        owner: root
-        group: root
-        mode: 0644
+    - name: Block for osp
+      when: cloud_provider == 'osp'
+      block:
+        - name: create openstack directory
+          file:
+            path: "/etc/openstack"
+            state: directory
+            owner: root
+            group: root
+            mode: 0755
+        - name: copy clouds.yaml template
+          template:
+            src: "./files/clouds.yaml.j2"
+            dest: /etc/openstack/clouds.yaml
+            owner: root
+            group: root
+            mode: 0644
     - name: Clone lab-setup repository
       git:
         repo: https://github.com/redhat-gpte-devopsautomation/lab-manager.git

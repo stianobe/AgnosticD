@@ -32,14 +32,14 @@ ansible_gitops_integration_user_info: true
 
 ## Below used variables are set for Role:set-repsitories
 ## for more details refer to README of the role 
-repo_method: file
-rhel_repos:
-  - rhel-7-server-rpms
-  - rhel-7-server-rh-common-rpms
-  - rhel-7-server-extras-rpms
-  - rhel-7-server-optional-rpms
-  - rhel-server-rhscl-7-rpms
-  - rhel-7-server-ansible-2.9-rpms
+# repo_method: file
+# rhel_repos:
+#   - rhel-7-server-rpms
+#   - rhel-7-server-rh-common-rpms
+#   - rhel-7-server-extras-rpms
+#   - rhel-7-server-optional-rpms
+#   - rhel-server-rhscl-7-rpms
+#   - rhel-7-server-ansible-2.9-rpms
 
 common_packages_el8:
   - python3
