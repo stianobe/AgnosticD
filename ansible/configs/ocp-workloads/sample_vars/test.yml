@@ -1,0 +1,34 @@
+env_type: ocp-workloads
+ocp_workload: ocp4_workload_shared_cluster_access
+
+# --- Workload parameters
+ocp4_workload_shared_cluster_access_user_groups:
+- OPENTLC-PROJECT-PROVISIONERS
+ocp4_workload_shared_cluster_access_create_quota: true
+ocp4_workload_shared_cluster_access_quota_name: "clusterquota-shared-{{ guid }}"
+ocp4_workload_shared_cluster_access_quota:
+  hard:
+    requests.cpu: "16"
+    limits.cpu: "16"
+    requests.memory: 20Gi
+    limits.memory: 45Gi
+    pods: "30"
+    configmaps: "100"
+    secrets: "150"
+    services: "150"
+    persistentvolumeclaims: "15"
+    requests.storage: 50Gi
+
+# --- Ensure the workload prints the correct statements for CloudForms to realize it finished
+workload_shared_deployment: true
+
+
+
+target_host_ansible_host: bastion.dev4.openshift.opentlc.com
+
+
+target_host:
+  ansible_host: "{{ target_host_ansible_host }}"
+  ansible_port: 22
+  ansible_user: ec2-user
+  ansible_ssh_private_key_file: ~/.ssh/opentlc_admin_backdoor.pem

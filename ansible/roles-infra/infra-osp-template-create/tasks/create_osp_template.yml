@@ -1,18 +1,18 @@
 ---
-- name: Wait for less than {{ osp_max_create_in_progress }} Heat stacks in CREATE_IN_PROGRESS
-  command: >-
-    openstack stack list --property stack_status=CREATE_IN_PROGRESS --format json
-  environment: "{{ __infra_osp_template_create_environment }}"
-  register: r_stack_list
-  until:
-  - r_stack_list.stdout | from_json | count <= osp_max_create_in_progress
-  retries: 10
-  delay: "{{ osp_max_create_in_progress_base_delay | random(start=osp_max_create_in_progress_random_delay) }}"
-  changed_when: false
+# - name: Wait for less than {{ osp_max_create_in_progress }} Heat stacks in CREATE_IN_PROGRESS
+#   command: >-
+#     openstack stack list --property stack_status=CREATE_IN_PROGRESS --format json
+#   environment: "{{ __infra_osp_template_create_environment }}"
+#   register: r_stack_list
+#   until:
+#   - r_stack_list.stdout | from_json | count <= osp_max_create_in_progress
+#   retries: 10
+#   delay: "{{ osp_max_create_in_progress_base_delay | random(start=osp_max_create_in_progress_random_delay) }}"
+#   changed_when: false
 
-- name: Show the number of creating stacks
-  debug:
-    msg: The number of creating stacks is {{ r_stack_list.stdout | from_json | count }}
+# - name: Show the number of creating stacks
+#   debug:
+#     msg: The number of creating stacks is {{ r_stack_list.stdout | from_json | count }}
 
 - name: Check if heat stack already exists
   command: >-

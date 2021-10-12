@@ -5,6 +5,52 @@
   tasks:
     - debug:
         msg: "Post-Software tasks Started"
+    - when: target_host is mapping
+      block:
+        - when:
+            - '"ansible_ssh_private_key_content" in target_host'
+            - '"ansible_ssh_private_key_file" in target_host'
+          fail:
+            msg: You cannot set both ansible_ssh_private_key_content and ansible_ssh_private_key_file
+
+        - when: '"ansible_ssh_private_key_content" in target_host'
+          block:
+            - name: Prepare ssh_key from provided content
+              copy:
+                content: "{{ target_host.ansible_ssh_private_key_content }}"
+                dest: "{{ output_dir }}/ssh_key.pem"
+                mode: 0600
+
+            - set_fact:
+                target_host_ansible_ssh_private_key_file: "{{ output_dir }}/ssh_key.pem"
+
+        - name: Add ocp shared bastion to inventory
+          add_host:
+            name: >-
+              {{
+              target_host.name
+              | default(target_host.hostname)
+              | default(target_host.ansible_host)
+              }}
+            ansible_host: "{{ target_host.ansible_host | default(omit) }}"
+            group: ocp_bastions
+            ansible_user: "{{ target_host.ansible_user | default(omit) }}"
+            ansible_port: "{{ target_host.ansible_port | default(omit) }}"
+            ansible_ssh_private_key_file: >-
+              {{ target_host.ansible_ssh_private_key_file
+              | default(target_host_ansible_ssh_private_key_file)
+              | default(omit) }}
+            ansible_ssh_extra_args: "{{ target_host.ansible_ssh_extra_args | default(omit) }}"
+            ansible_ssh_pipelining: true
+
+    - when: target_host is string
+      block:
+        - name: Add bastion to inventory (simple hostname)
+          add_host:
+            name: "{{ target_host }}"
+            group: ocp_bastions
+
+# - import_playbook: ../../include_vars.yml
 
 
 - name: Post software config
@@ -26,6 +72,113 @@
         name: NetworkManager
         state: restarted
 
+
+- name: Deploy workload(s) role on bastion of the shared cluster
+  hosts: ocp_bastions
+  become: false
+  gather_facts: false
+  tags:
+  - step005
+  tasks:
+  - name: Set up combined ocp_workloads dictionary
+    set_fact:
+      config_ocp_workloads: >-
+        {{ config_ocp_workloads_defaults
+        | combine( config_ocp_workloads_vars    | default( {} ),
+                   config_ocp_workloads_secrets | default( {} ), recursive=true)
+        }}
+  - name: Print combined role variables
+    debug:
+      var: config_ocp_workloads
+      verbosity: 2
+
+  # This is a potential future enhancement... For now just check if one is there
+  # and use it when it's there
+  # - name: Ensure virtualenv exists if it should be used
+  #   when: config_ocp_workloads.use_virtualenv | bool
+  #   block:
+  #   - name: Check if desired virtualenv is available on the host
+  #     stat:
+  #       path: "{{ config_ocp_workloads.virtualenv_path}}/bin/python"
+  #     register: r_virtualenv
+
+  #   - name: Install Virtualenv if it doesn't exist yet
+  #     when:
+  #     - not r_virtualenv.exists
+  #     - config_ocp_workloads.install_virtualenv | bool
+  #     block:
+  #     - name: Ensure Virtualenv package is installed
+  #       package:
+  #         state: present
+  #         name: "{{ config_ocp_workloads.virtualenv_package }}"
+  #     - name: Set up Virtualenv
+  #       pip:
+  #         state: present
+  #         name: "{{ config_ocp_workloads.python_packages }}"
+  #         virtualenv: "{{ config_ocp_workloads.virtualenv_path }}"
+  #         virtualenv_python: "{{ config_ocp_workloads.virtualenv_python }}"
+
+  - name: Check if desired virtualenv is available on the host
+    stat:
+      path: "{{ config_ocp_workloads.virtualenv_path}}/bin/python"
+    register: r_virtualenv
+
+  - name: Set Ansible Python interpreter to virtualenv
+    when: r_virtualenv.stat.exists
+    set_fact:
+      ansible_python_interpreter: "{{ config_ocp_workloads.virtualenv_path }}/bin/python"
+
+  # - name: Install infra_workloads
+  #   tags:
+  #   - infra_workloads
+  #   loop: "{{ infra_workloads }}"
+  #   loop_control:
+  #     loop_var: __workload_role
+  #   include_role:
+  #     name: "{{ __workload_role }}"
+  #   vars:
+  #     ocp_username: system:admin
+  #     ACTION: provision
+
+  - name: Run a single workload
+    when: ocp_workload is defined
+    include_role:
+      name: "{{ ocp_workload }}"
+    vars:
+      ACTION: create
+
+  - name: Run a list of workloads
+    when:
+    - ocp_workloads is defined
+    - ocp_workloads | length > 0
+    loop: "{{ ocp_workloads }}"
+    loop_control:
+      loop_var: _ocp_workload
+    include_role:
+      name: "{{ _ocp_workload }}"
+    vars:
+      ACTION: create
+
+  # - name: Install student_workloads
+  #   tags:
+  #   - student_workloads
+  #   loop: >-
+  #     {{ range(user_count_start | int, user_count_start | int + user_count | int)
+  #      | product(student_workloads)
+  #      | list
+  #     }}
+  #   loop_control:
+  #     loop_var: __user_n_workload_role
+  #     label: "{{ __workload_role }} for {{ ocp_username }}"
+  #   vars:
+  #     ACTION: provision
+  #     ocp_username: "user{{ __user_n_workload_role[0] }}"
+  #     __workload_role: "{{ __user_n_workload_role[1] }}"
+  #   include_role:
+  #     name: "{{ __workload_role }}"
+
+- name: Cleanup
+  import_playbook: cleanup.yml
 
 - name: Deploy userinfo setup
   hosts: localhost
