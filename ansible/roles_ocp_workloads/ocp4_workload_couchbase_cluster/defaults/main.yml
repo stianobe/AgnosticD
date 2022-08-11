@@ -5,13 +5,10 @@ silent: false
 
 num_users: "100"
 
-# Establish the Couchbase cluster namespace
-couchbase_cluster_namespace: twitter
-
-# Define operator metadata
-ocs_operator_channel: stable
-ocs_source_namespace: openshift-marketplace
-ocs_source: certified-operators
-ocs_spec_name: couchbase-enterprise-certified
-couchbase_metadata_name: couchbase-operator-subscription
-couchbase_subscription_namespace: openshift-operators
+ocp4_workload_couchbase_cluster_namespace: twitter
+ocp4_workload_couchbase_operator_channel: stable
+ocp4_workload_couchbase_source_namespace: openshift-marketplace
+ocp4_workload_couchbase_source: certified-operators
+ocp4_workload_couchbase_spec_name: couchbase-enterprise-certified
+ocp4_workload_couchbase_metadata_name: couchbase-operator-subscription
+ocp4_workload_couchbase_subscription_namespace: openshift-operators
