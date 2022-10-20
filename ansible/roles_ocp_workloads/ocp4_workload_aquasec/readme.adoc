@@ -1,4 +1,4 @@
-= ocp4_workload_aquasec - Workload Role for Prisma Cloud Workshop
+= ocp4_workload_aquasec - Workload Role for Aquasec Workshop
 
 == Role Overview
 
