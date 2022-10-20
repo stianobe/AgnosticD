@@ -9,6 +9,6 @@ spec:
     version: '{{ ocp4_workload_aquasec_sub_channel }}'
   runAsNonRoot: false
   gateway:
-    host: aqua-gateway
-    port: 8443
+    host: {{ ocp4_workload_aquasec_gateway_url }}
+    port: 443
   token: {{ ocp4_workload_aquasec_enforcer_token }}

@@ -8,7 +8,7 @@ spec:
     version: '{{ ocp4_workload_aquasec_sub_channel }}'
     serviceAccount: {{ ocp4_workload_aquasec_kube_enforcer_sa }}
   config:
-    gateway_address: 'aqua-gateway:8443'
+    gateway_address: '{{ ocp4_workload_aquasec_gateway_url }}:443'
     cluster_name: aqua-secure
     imagePullSecret: aqua-registry
   deploy:

@@ -4,13 +4,6 @@
     # yamllint disable-line rule:line-length
     ocp4_workload_aquasec_base64: "{{ (ocp4_workload_aquasec.quay_username + ':' + ocp4_workload_aquasec.quay_password) | b64encode }}"
 
-#- debug:
-#    msg: "{{ ocp4_workload_aquasec.private_registry_url }}"
-#
-#- name: set json for dockerconfigjson
-#  set_fact:
-#    ocp4_workload_nginxplus_dockerconfigjson: "{{ lookup('template', 'aquasec-dockerconfigjson.j2') }}"
-
 - name: Create {{ ocp4_workload_aquasec_namespace }} namespace
   kubernetes.core.k8s:
     name: "{{ ocp4_workload_aquasec_namespace }}"
@@ -71,6 +64,22 @@
   ansible.builtin.wait_for:
     timeout: "{{ ocp4_workload_aquasec_wait * 9 }}"
 
+- name: extract Aqua Gateway URL
+  kubernetes.core.k8s_info:
+    kind: Route
+    namespace: "{{ ocp4_workload_aquasec_namespace }}"
+    name: aqua-csp-gateway
+  register: r_gateway_route
+  until: result is not failed
+  retries: 10
+  delay: 6
+
+- debug:
+    msg: "{{ r_gateway_route.resources[0].spec.host }}"
+
+- set_fact:
+    ocp4_workload_aquasec_gateway_url: "{{ r_gateway_route.resources[0].spec.host }}"
+
 - name: Create Aqua Enforcer for {{ ocp4_workload_aquasec_namespace }}
   kubernetes.core.k8s:
     state: present
@@ -107,9 +116,6 @@
   retries: 10
   delay: 6
 
-- debug:
-    msg: "{{ r_aqua_route.resources[0].spec.host }}"
-
 - set_fact:
     ocp4_workload_aquasec_route: "{{ r_aqua_route.resources[0].spec.host }}"
 
@@ -132,6 +138,7 @@
     force_basic_auth: yes
     validate_certs: false
     status_code: 200
+  ignore_errors: true
 
 - name: POST KubeEnforcerGroup
   ansible.builtin.uri:
@@ -144,6 +151,7 @@
     force_basic_auth: yes
     validate_certs: false
     status_code: 200
+  ignore_errors: true
 
 - name: Create Sock Shop project
   kubernetes.core.k8s:
