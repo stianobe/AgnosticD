@@ -1,8 +1,8 @@
-= ocp4_workload_paloalto_prismacloud - Workload Role for Prisma Cloud Workshop
+= ocp4_workload_aquasec - Workload Role for Prisma Cloud Workshop
 
 == Role Overview
 
-This role deploys the Prisma Cloud Compute and Defenders on OpenShift
+This role deploys the Aquasec operator on OpenShift
 
 === Task Files
 
