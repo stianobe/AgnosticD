@@ -61,5 +61,4 @@
     - name: remove downloaded file
       ansible.builtin.file:
         path: "/home/{{ ansible_user }}/ocp.tgz"
-        state: absent
   when: ocp4_network_type|default("OpenshiftSDN") == "Calico"
