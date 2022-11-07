@@ -1,0 +1,134 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  creationTimestamp: '2022-11-04T15:25:12Z'
+  generation: 1
+  labels:
+    operators.coreos.com/tigera-operator.openshift-operators: ''
+  managedFields:
+    - apiVersion: operators.coreos.com/v1alpha1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:spec':
+          .: {}
+          'f:channel': {}
+          'f:installPlanApproval': {}
+          'f:name': {}
+          'f:source': {}
+          'f:sourceNamespace': {}
+          'f:startingCSV': {}
+      manager: Mozilla
+      operation: Update
+      time: '2022-11-04T15:25:12Z'
+    - apiVersion: operators.coreos.com/v1alpha1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:labels':
+            .: {}
+            'f:operators.coreos.com/tigera-operator.openshift-operators': {}
+      manager: olm
+      operation: Update
+      time: '2022-11-04T15:25:12Z'
+    - apiVersion: operators.coreos.com/v1alpha1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:status':
+          'f:installedCSV': {}
+          'f:currentCSV': {}
+          'f:catalogHealth': {}
+          'f:installPlanRef':
+            .: {}
+            'f:apiVersion': {}
+            'f:kind': {}
+            'f:name': {}
+            'f:namespace': {}
+            'f:resourceVersion': {}
+            'f:uid': {}
+          'f:installPlanGeneration': {}
+          'f:conditions': {}
+          .: {}
+          'f:installplan':
+            .: {}
+            'f:apiVersion': {}
+            'f:kind': {}
+            'f:name': {}
+            'f:uuid': {}
+          'f:lastUpdated': {}
+          'f:state': {}
+      manager: catalog
+      operation: Update
+      subresource: status
+      time: '2022-11-04T15:25:41Z'
+  name: tigera-operator
+  namespace: openshift-operators
+  resourceVersion: '35186'
+  uid: 6950ef5a-b901-4905-ad0b-b1f043ead56a
+spec:
+  channel: release-v1.25
+  installPlanApproval: Automatic
+  name: tigera-operator
+  source: certified-operators
+  sourceNamespace: openshift-marketplace
+  startingCSV: tigera-operator.v1.25.1
+status:
+  installplan:
+    apiVersion: operators.coreos.com/v1alpha1
+    kind: InstallPlan
+    name: install-4gpjt
+    uuid: 20bcfeb2-dfc1-4c99-b8d6-b66ad3e1f2b8
+  lastUpdated: '2022-11-04T15:25:43Z'
+  installedCSV: tigera-operator.v1.25.1
+  currentCSV: tigera-operator.v1.25.1
+  installPlanRef:
+    apiVersion: operators.coreos.com/v1alpha1
+    kind: InstallPlan
+    name: install-4gpjt
+    namespace: openshift-operators
+    resourceVersion: '34738'
+    uid: 20bcfeb2-dfc1-4c99-b8d6-b66ad3e1f2b8
+  state: AtLatestKnown
+  catalogHealth:
+    - catalogSourceRef:
+        apiVersion: operators.coreos.com/v1alpha1
+        kind: CatalogSource
+        name: certified-operators
+        namespace: openshift-marketplace
+        resourceVersion: '33743'
+        uid: c10cde57-8f0d-491b-a481-1a3cc3de1447
+      healthy: true
+      lastUpdated: '2022-11-04T15:25:12Z'
+    - catalogSourceRef:
+        apiVersion: operators.coreos.com/v1alpha1
+        kind: CatalogSource
+        name: community-operators
+        namespace: openshift-marketplace
+        resourceVersion: '33742'
+        uid: 2255ae5e-d6b1-41cd-a83b-39be759fa713
+      healthy: true
+      lastUpdated: '2022-11-04T15:25:12Z'
+    - catalogSourceRef:
+        apiVersion: operators.coreos.com/v1alpha1
+        kind: CatalogSource
+        name: redhat-marketplace
+        namespace: openshift-marketplace
+        resourceVersion: '32443'
+        uid: 8b3a4782-cf9b-4c3c-b704-f4a923d1b4ba
+      healthy: true
+      lastUpdated: '2022-11-04T15:25:12Z'
+    - catalogSourceRef:
+        apiVersion: operators.coreos.com/v1alpha1
+        kind: CatalogSource
+        name: redhat-operators
+        namespace: openshift-marketplace
+        resourceVersion: '32455'
+        uid: 146c82fb-ea24-4630-b5ac-2744e1532fff
+      healthy: true
+      lastUpdated: '2022-11-04T15:25:12Z'
+  conditions:
+    - lastTransitionTime: '2022-11-04T15:25:12Z'
+      message: all available catalogsources are healthy
+      reason: AllCatalogSourcesHealthy
+      status: 'False'
+      type: CatalogSourcesUnhealthy
+  installPlanGeneration: 1
