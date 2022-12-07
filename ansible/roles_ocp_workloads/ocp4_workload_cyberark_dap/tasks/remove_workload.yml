@@ -37,6 +37,7 @@
 - name: Remove CyberArk Master
   k8s:
     state: absent
+    # yamllint disable-line rule:line-length
     src: ~{{ansible_user}}/cyberark_setup/{{ ocp4_workload_cyberark_setup_files_release }}/master-deployment-manifest.yaml
 
 - name: Remove CyberArk resources

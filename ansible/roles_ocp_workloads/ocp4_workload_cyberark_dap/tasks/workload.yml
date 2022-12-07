@@ -11,9 +11,6 @@
     path: /home/{{ansible_user}}/cyberark_setup
     state: directory
 
-- debug:
-    msg: "{{ ocp4_workload_cyberark_setup_files_url }}"
-
 - name: Download cyberark rhpds setup files
   ansible.builtin.get_url:
     url: "https://github.com/conjurdemos/ocp4-workshop-setup/archive/v{{ ocp4_workload_cyberark_setup_version }}.tar.gz"
@@ -162,6 +159,7 @@
   until:
     - r_dap_cyberark_core_deployment.resources | length | int > 0
     - r_dap_cyberark_core_deployment.resources[0].status.readyReplicas is defined
+    # yamllint disable-line rule:line-length
     - r_dap_cyberark_core_deployment.resources[0].status.readyReplicas | int == r_dap_cyberark_core_deployment.resources[0].spec.replicas | int
 
 - name: Provide DAP Access to RHPDS deployer
