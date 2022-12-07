@@ -8,20 +8,28 @@
 
 - name: Create the cyberark setup directory
   file:
-    path: ~{{ansible_user}}/cyberark_setup
+    path: /home/{{ansible_user}}/cyberark_setup
     state: directory
 
-- name: Download the CyberArk RHPDS setup files
+- debug:
+    msg: "{{ ocp4_workload_cyberark_setup_files_url }}"
+
+- name: Download cyberark rhpds setup files
+  ansible.builtin.get_url:
+    url: "https://github.com/conjurdemos/ocp4-workshop-setup/archive/v{{ ocp4_workload_cyberark_setup_version }}.tar.gz"
+    dest: "/tmp/{{ ocp4_workload_cyberark_setup_version }}.tar.gz"
+
+- name: unarchive the CyberArk RHPDS setup files
   become: true
   unarchive:
-    src: "{{ ocp4_workload_cyberark_setup_files_url }}"
-    dest: ~{{ansible_user}}/cyberark_setup
+    src: "/tmp/{{ ocp4_workload_cyberark_setup_version }}.tar.gz"
+    dest: /home/{{ansible_user}}/cyberark_setup
     remote_src: true
     owner: "{{ ansible_user }}"
     group: users
   register: unarchive_result
   until: unarchive_result is not failed
-  retries: 5
+  retries: 10
   delay: 3
 
 - name: Set random password for dap
@@ -29,7 +37,7 @@
     dap_pwd: "{{ lookup('password', '/dev/null length=111 chars=ascii_letters,digits,hexdigits,@,#,$,%,^,*,') }}"
 
 - name: create CyberArk resources
-  k8s:
+  kubernetes.core.k8s:
     state: present
     definition: "{{ lookup('template', item ) | from_yaml }}"
   loop:
@@ -45,6 +53,10 @@
   command: >-
     ~{{ansible_user}}/cyberark_setup/{{ ocp4_workload_cyberark_setup_files_release }}/master_deploy.sh
     {{ ocp4_workload_cyberark_project }} {{ dap_pwd }} {{ ocp4_workload_cyberark_setup_files_release }}
+  register: result
+  until: result is not failed
+  retries: 6
+  delay: 10
 
 - name: Deploy mysqldb
   command: >-
@@ -52,7 +64,7 @@
     {{ ocp4_workload_cyberark_project }} {{ ocp4_workload_cyberark_setup_files_release }}
 
 - name: Create lab user demo projects
-  k8s:
+  kubernetes.core.k8s:
     state: present
     definition:
       apiVersion: project.openshift.io/v1
@@ -62,7 +74,7 @@
   loop: "{{ range(1, num_users | int + 1, 1) | list }}"
 
 - name: Grant the authentication service access to pods in each user project
-  k8s:
+  kubernetes.core.k8s:
     state: present
     definition:
       kind: RoleBinding
@@ -81,7 +93,7 @@
   loop: "{{ range(1, num_users | int + 1, 1) | list }}"
 
 - name: Grant namespace admin privileges to user & labadmin SA
-  k8s:
+  kubernetes.core.k8s:
     state: present
     definition:
       kind: RoleBinding
@@ -107,7 +119,7 @@
   loop: "{{ range(1, num_users | int + 1, 1) | list }}"
 
 - name: Grant users read-only access to the DAP config map
-  k8s:
+  kubernetes.core.k8s:
     state: present
     definition:
       kind: RoleBinding
@@ -139,7 +151,7 @@
   register: cyberark_url
 
 - name: Ensure CyberArk availability by querying the OpenShift API
-  k8s_info:
+  kubernetes.core.k8s_info:
     api_version: v1
     kind: Deployment
     namespace: "{{ ocp4_workload_cyberark_project }}"
